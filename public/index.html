@@ -99,13 +99,19 @@
     <!-- Réglages -->
     <section id="vue-reglages" class="vue" hidden>
       <h2>Réglages</h2>
+      <div class="carte carte-sans-cle" id="carte-claude-ai" hidden>
+        <h3>Analyser sans clé API</h3>
+        <p class="muted">Ouvre NetScan sur claude.ai : l'analyse passe par ton compte Claude, sans clé ni crédit à acheter. Connecte-toi à claude.ai, puis reprends ta photo là-bas.</p>
+        <a class="btn-principal" id="lien-claude-ai" href="https://claude.ai/artifact/H1swDNTebB1nnT7PFtLmUS" target="_blank" rel="noopener">Ouvrir NetScan sur claude.ai</a>
+        <p class="muted petit">Réservé aux personnes avec qui la page a été partagée sur claude.ai.</p>
+      </div>
       <div class="carte" id="carte-compte" hidden>
         <h3>Ton compte Claude</h3>
         <p class="muted">Sur claude.ai, NetScan utilise directement ton compte Claude : pas besoin de clé API ni de crédit. Chaque analyse compte dans l'utilisation de ton abonnement. La première fois, Claude te demande d'autoriser la page.</p>
         <p class="muted" id="etat-compte"></p>
       </div>
       <div class="carte" id="carte-cle">
-        <h3>Clé API Anthropic</h3>
+        <h3>Ou avec une clé API Anthropic</h3>
         <p class="muted">Nécessaire pour analyser tes photos. Elle est enregistrée uniquement sur cet appareil, et envoyée seulement à l'API d'Anthropic. Elle n'est jamais publiée sur GitHub.</p>
         <label class="champ" for="cle-api">
           <span>Clé</span>
