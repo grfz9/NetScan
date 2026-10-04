@@ -8,12 +8,14 @@ import {
   analyserAvecCompteClaude,
   messageErreurCompteClaude,
 } from "./coeur.js";
+import { URL_RELAIS } from "./config.js";
 
 const $ = (sel) => document.querySelector(sel);
 const CLE_HISTORIQUE = "netscan.historique";
 const CLE_API = "netscan.cleApi";
 const CLE_MODELE = "netscan.modele";
 const CLE_MATERIEL = "netscan.materiel";
+const CLE_CODE = "netscan.codeAcces";
 const RACCOURCIS_MATERIEL = [
   "Routeur Cisco 1841",
   "Routeur Cisco 2911",
@@ -66,10 +68,12 @@ const modeleChoisi = () => lire(CLE_MODELE) || MODELE_PAR_DEFAUT;
 
 // "serveur" si le serveur Node a sa propre clé, "navigateur" si une clé est enregistrée ici.
 // "claude" si la page est ouverte sur claude.ai : c'est le compte Claude qui analyse, sans clé.
+// "relais" si un code d'accès est enregistré : le relais NetScan prête sa clé.
 function modeAnalyse() {
   if (etat.serveur.cle) return "serveur";
   if (etat.compteClaude) return "claude";
   if (lire(CLE_API)) return "navigateur";
+  if (URL_RELAIS && lire(CLE_CODE)) return "relais";
   return null;
 }
 
@@ -233,7 +237,7 @@ async function lancerAnalyse() {
   const mode = modeAnalyse();
   if (!mode) {
     afficherReglages();
-    toast("Pour analyser sans clé, ouvre NetScan sur claude.ai.", true);
+    toast(URL_RELAIS ? "Entre le code d'accès NetScan ou ta clé API pour analyser." : "Pour analyser sans clé, ouvre NetScan sur claude.ai.", true);
     return;
   }
   const contexte = $("#contexte").value.trim();
@@ -252,7 +256,12 @@ async function lancerAnalyse() {
   afficherVue("chargement");
 
   try {
-    const analyser = { serveur: analyserViaServeur, claude: analyserViaCompteClaude, navigateur: analyserDansNavigateur }[mode];
+    const analyser = {
+      serveur: analyserViaServeur,
+      relais: analyserViaRelais,
+      claude: analyserViaCompteClaude,
+      navigateur: analyserDansNavigateur,
+    }[mode];
     const resultat = await analyser({ images, contexte, materiel, onEtape: marquerEtape });
     const vignette = images.length ? await miniatureDepuis(etat.photos[0].apercu).catch(() => "") : "";
     enregistrerHistorique({ resultat, contexte, vignette });
@@ -294,15 +303,33 @@ async function analyserViaCompteClaude({ images, contexte, materiel, onEtape }) 
 }
 
 // Mode serveur : le serveur Node appelle Claude et renvoie la progression en NDJSON.
-async function analyserViaServeur({ images, contexte, materiel, onEtape }) {
-  const reponse = await fetch("api/analyse", {
+const analyserViaServeur = ({ images, contexte, materiel, onEtape }) =>
+  analyserEnFlux("api/analyse", { images, contexte, materiel }, onEtape);
+
+// Mode relais : même format, mais c'est le relais Cloudflare qui détient la clé.
+async function analyserViaRelais({ images, contexte, materiel, onEtape }) {
+  try {
+    return await analyserEnFlux(`${URL_RELAIS}/analyse`, { code: lire(CLE_CODE), images, contexte, materiel }, onEtape);
+  } catch (err) {
+    if (err.statut === 401) {
+      ecrire(CLE_CODE, "");
+      majStatut();
+      throw new Error("Code d'accès incorrect ou changé : entre le nouveau code dans les Réglages.");
+    }
+    if (err instanceof TypeError) throw new Error("Impossible de joindre le relais NetScan. Vérifie ta connexion Internet.");
+    throw err;
+  }
+}
+
+async function analyserEnFlux(url, corpsRequete, onEtape) {
+  const reponse = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ images, contexte, materiel }),
+    body: JSON.stringify(corpsRequete),
   });
   if (!reponse.ok) {
     const corps = await reponse.json().catch(() => ({}));
-    throw new Error(corps.erreur || `Erreur du serveur (${reponse.status}).`);
+    throw Object.assign(new Error(corps.erreur || `Erreur du serveur (${reponse.status}).`), { statut: reponse.status });
   }
 
   let resultat = null;
@@ -854,6 +881,9 @@ function afficherReglages() {
   $("#carte-compte").hidden = !surClaude;
   // Sans serveur ni compte Claude (GitHub Pages) : on propose d'abord la version claude.ai, gratuite.
   $("#carte-claude-ai").hidden = surClaude || modeAnalyse() === "serveur";
+  $("#carte-code").hidden = surClaude || !URL_RELAIS || modeAnalyse() === "serveur";
+  $("#code-acces").value = "";
+  $("#etat-code").textContent = lire(CLE_CODE) ? "Code enregistré sur cet appareil." : "";
   $("#carte-cle h3").textContent = $("#carte-claude-ai").hidden ? "Clé API Anthropic" : "Ou avec une clé API Anthropic";
   $("#carte-cle").hidden = surClaude;
   $("#carte-modele").hidden = surClaude;
@@ -886,6 +916,10 @@ function majStatut() {
     el.textContent = etat.messageCompteClaude;
   } else if (mode === "navigateur") {
     el.textContent = `Clé API enregistrée sur cet appareil · ${$("#choix-modele").selectedOptions[0].text.split(" —")[0]}`;
+  } else if (mode === "relais") {
+    el.textContent = "Analyse avec la clé partagée NetScan (code d'accès).";
+  } else if (URL_RELAIS && !SUR_CLAUDE_AI) {
+    el.innerHTML = `Pour analyser tes photos, <button type="button" class="lien-texte" id="lien-reglages">entre le code d'accès NetScan</button> ou ta propre clé API. L'exemple fonctionne sans.`;
   } else {
     el.innerHTML = `Pour analyser tes photos sans clé, <a class="lien-texte" href="https://claude.ai/artifact/H1swDNTebB1nnT7PFtLmUS" target="_blank" rel="noopener">ouvre NetScan sur claude.ai</a>, ou <button type="button" class="lien-texte" id="lien-reglages">ajoute une clé API</button>. L'exemple fonctionne sans.`;
   }
@@ -904,6 +938,37 @@ $("#btn-enregistrer-cle").addEventListener("click", () => {
   $("#cle-api").value = "";
   majEtatCle();
   toast("Clé enregistrée sur cet appareil.");
+});
+
+$("#btn-enregistrer-code").addEventListener("click", async () => {
+  const code = $("#code-acces").value.trim();
+  if (!code) return toast("Entre d'abord le code.", true);
+  $("#btn-enregistrer-code").disabled = true;
+  try {
+    const reponse = await fetch(`${URL_RELAIS}/verifier`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code }),
+    });
+    const corps = await reponse.json().catch(() => ({}));
+    if (!reponse.ok) return toast(corps.erreur || "Code refusé.", true);
+    if (!ecrire(CLE_CODE, code)) return toast("Impossible d'enregistrer le code (navigation privée ?).", true);
+    $("#code-acces").value = "";
+    $("#etat-code").textContent = "Code enregistré sur cet appareil.";
+    majStatut();
+    toast("Code accepté : tu peux analyser tes photos.");
+  } catch {
+    toast("Impossible de joindre le relais NetScan. Vérifie ta connexion Internet.", true);
+  } finally {
+    $("#btn-enregistrer-code").disabled = false;
+  }
+});
+
+$("#btn-supprimer-code").addEventListener("click", () => {
+  ecrire(CLE_CODE, "");
+  $("#etat-code").textContent = "";
+  majStatut();
+  toast("Code retiré de cet appareil.");
 });
 
 $("#btn-supprimer-cle").addEventListener("click", () => {

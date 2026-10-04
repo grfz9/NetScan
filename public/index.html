@@ -118,6 +118,19 @@
     <!-- Réglages -->
     <section id="vue-reglages" class="vue" hidden>
       <h2>Réglages</h2>
+      <div class="carte carte-sans-cle" id="carte-code" hidden>
+        <h3>Code d'accès NetScan</h3>
+        <p class="muted">Si on t'a donné un code d'accès, entre-le ici : tes analyses utiliseront la clé partagée de NetScan, sans rien payer ni créer de compte.</p>
+        <label class="champ" for="code-acces">
+          <span>Code</span>
+          <input id="code-acces" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="100">
+        </label>
+        <div class="actions-ligne">
+          <button id="btn-enregistrer-code" class="btn-principal" type="button">Valider le code</button>
+          <button id="btn-supprimer-code" class="btn-secondaire" type="button">Retirer</button>
+        </div>
+        <p class="muted" id="etat-code"></p>
+      </div>
       <div class="carte carte-sans-cle" id="carte-claude-ai" hidden>
         <h3>Analyser sans clé API</h3>
         <p class="muted">Ouvre NetScan sur claude.ai : l'analyse passe par ton compte Claude, sans clé ni crédit à acheter. Connecte-toi à claude.ai, puis reprends ta photo là-bas.</p>
