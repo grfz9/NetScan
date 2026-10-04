@@ -196,7 +196,7 @@ function afficherMiniatures() {
     .join("");
   zone.hidden = etat.photos.length === 0;
   $("#aide-photos").hidden = etat.photos.length === 0;
-  $("#btn-analyser").disabled = etat.photos.length === 0;
+  majBoutonAnalyser();
   $(".btn-photo span").textContent = etat.photos.length ? "Ajouter une photo" : "Prendre une photo";
 }
 
@@ -214,8 +214,17 @@ function marquerEtape(nom) {
   });
 }
 
+// On peut analyser des photos, ou seulement une description écrite de l'installation.
+function majBoutonAnalyser() {
+  $("#btn-analyser").disabled = etat.photos.length === 0 && !$("#contexte").value.trim();
+}
+
+const TEXTE_SANS_PHOTO =
+  "Ici, claude.ai ne permet pas d'envoyer des photos à Claude. Décris ton installation dans la consigne (équipements, câbles, ports, config) : NetScan l'analysera à partir du texte.";
+
 async function lancerAnalyse() {
-  if (!etat.photos.length) return;
+  const contexteSaisi = $("#contexte").value.trim();
+  if (!etat.photos.length && !contexteSaisi) return;
   if (SUR_CLAUDE_AI && !etat.compteClaude) {
     toast("Connexion à ton compte Claude…");
     await connexionClaude;
@@ -229,15 +238,23 @@ async function lancerAnalyse() {
   }
   const contexte = $("#contexte").value.trim();
   const materiel = $("#utiliser-materiel").checked ? lireMateriel() : [];
-  const images = etat.photos.map(({ data, media_type }) => ({ data, media_type }));
-  $("#scan-image").src = etat.photos[0].apercu;
+  let images = etat.photos.map(({ data, media_type }) => ({ data, media_type }));
+  if (mode === "claude" && etat.compteClaude.sansPhotos && images.length) {
+    if (!contexte) {
+      $("#contexte").focus();
+      return toast(TEXTE_SANS_PHOTO, true);
+    }
+    images = [];
+    toast("Les photos ne peuvent pas être envoyées ici : analyse à partir de ta description.");
+  }
+  $("#scan-image").src = images.length ? etat.photos[0].apercu : "demo/exemple.svg";
   marquerEtape("envoi");
   afficherVue("chargement");
 
   try {
     const analyser = { serveur: analyserViaServeur, claude: analyserViaCompteClaude, navigateur: analyserDansNavigateur }[mode];
     const resultat = await analyser({ images, contexte, materiel, onEtape: marquerEtape });
-    const vignette = await miniatureDepuis(etat.photos[0].apercu).catch(() => "");
+    const vignette = images.length ? await miniatureDepuis(etat.photos[0].apercu).catch(() => "") : "";
     enregistrerHistorique({ resultat, contexte, vignette });
     afficherResultat(resultat);
   } catch (err) {
@@ -257,6 +274,21 @@ async function analyserViaCompteClaude({ images, contexte, materiel, onEtape }) 
   try {
     return await analyserAvecCompteClaude(etat.compteClaude.sample, { images: fichiers, contexte, materiel, onEtape });
   } catch (err) {
+    // claude.ai refuse les photos dans cette vue : on retient l'info et on repart du texte si possible.
+    if (err?.code === "images_unavailable") {
+      etat.compteClaude.sansPhotos = true;
+      majStatut();
+      if (contexte) {
+        toast("Les photos ne peuvent pas être envoyées ici : analyse à partir de ta description.");
+        try {
+          return await analyserAvecCompteClaude(etat.compteClaude.sample, { images: [], contexte, materiel, onEtape });
+        } catch (err2) {
+          throw new Error(messageErreurCompteClaude(err2));
+        }
+      }
+      $("#contexte").focus();
+      throw new Error(TEXTE_SANS_PHOTO);
+    }
     throw new Error(messageErreurCompteClaude(err));
   }
 }
@@ -669,6 +701,7 @@ $("#miniatures").addEventListener("click", (e) => {
 });
 
 $("#btn-analyser").addEventListener("click", lancerAnalyse);
+$("#contexte").addEventListener("input", majBoutonAnalyser);
 $("#btn-demo").addEventListener("click", lancerDemo);
 $("#btn-accueil").addEventListener("click", () => afficherVue("accueil"));
 $("#btn-historique").addEventListener("click", afficherHistorique);
@@ -845,6 +878,8 @@ function majStatut() {
   const mode = modeAnalyse();
   if (mode === "serveur") {
     el.textContent = `Analyse par le serveur (${etat.serveur.modele}).`;
+  } else if (mode === "claude" && etat.compteClaude.sansPhotos) {
+    el.textContent = TEXTE_SANS_PHOTO;
   } else if (mode === "claude") {
     el.textContent = `Analyse avec ton compte Claude, sans clé API · ${maxPhotos()} photos max.`;
   } else if (SUR_CLAUDE_AI) {
@@ -904,12 +939,15 @@ async function connecterCompteClaude() {
       etat.messageCompteClaude =
         "Cette page n'a pas accès à ton compte Claude ici. Ouvre-la depuis claude.ai en étant connecté.";
     } else {
+      // limits() n'est qu'une indication : si elle échoue, on essaie quand même d'envoyer les photos,
+      // et seul un vrai refus (images_unavailable) bascule sur l'analyse d'une description écrite.
       const limites = await sample.limits().catch(() => null);
-      if (!limites?.images) {
-        etat.messageCompteClaude =
-          "Ici, Claude ne peut pas recevoir de photos. Ouvre la page sur claude.ai dans un navigateur (Chrome, Safari…).";
-      } else {
-        etat.compteClaude = { sample, maxPhotos: Math.min(MAX_PHOTOS, limites.images.maxCount) };
+      etat.compteClaude = {
+        sample,
+        maxPhotos: Math.min(MAX_PHOTOS, limites?.images?.maxCount ?? MAX_PHOTOS),
+        sansPhotos: Boolean(limites) && !limites.images,
+      };
+      if (!etat.compteClaude.sansPhotos) {
         $("#aide-photos").textContent = `Tu peux ajouter jusqu'à ${maxPhotos()} photos : la façade de chaque équipement, l'arrière, l'écran de config, le schéma du TP…`;
       }
     }
