@@ -124,6 +124,31 @@ export const SCHEMA_ANALYSE = obj({
     }),
     "Raisonnement étape par étape, comme Photomath"
   ),
+  schema_propose: obj({
+    objectif: str("Ce que le réseau doit permettre, en une phrase (d'après la consigne, sinon l'usage le plus probable)"),
+    equipements: arr(
+      obj({
+        id: str("Même id que dans equipements si l'équipement existe déjà, sinon un nouvel id"),
+        nom: str("Nom lisible"),
+        type: enumStr(TYPES_EQUIPEMENT, "Catégorie de l'équipement"),
+        modele: str("Modèle ou chaîne vide"),
+      }),
+      "Équipements du schéma conseillé"
+    ),
+    liens: arr(
+      obj({
+        de: str("id de départ"),
+        port_de: str("Port côté départ"),
+        vers: str("id d'arrivée"),
+        port_vers: str("Port côté arrivée"),
+        cable: enumStr(["droit", "croise", "fibre", "console", "serie", "wifi", "inconnu"], "Type de câble"),
+        remarque: str("Rôle de ce câble, chaîne vide si évident"),
+      }),
+      "Câblage conseillé, complet"
+    ),
+    avantages: arr(str("Une raison"), "Pourquoi ce schéma fonctionne mieux, en phrases simples pour un débutant"),
+    changements: arr(str("Une action concrète"), "Ce qu'il faut changer par rapport à l'existant, dans l'ordre (débrancher, rebrancher, ajouter...)"),
+  }),
   materiel_a_prevoir: arr(
     obj({
       element: str("Équipement, câble ou module à se procurer (ex : câble croisé, carte WIC-2T)"),

@@ -224,7 +224,7 @@ export function dessinerTopologie(source, { simple = false } = {}) {
   // Zones déjà occupées (icônes, noms, étiquettes de ports) pour éviter les chevauchements.
   const occupe = [];
   for (const { x, y } of xy.values()) {
-    occupe.push({ x: x - 27, y: y - 27, w: 54, h: 54 }, { x: x - 66, y: y + 26, w: 132, h: 32 });
+    occupe.push({ x: x - 27, y: y - 27, w: 54, h: 54 }, { x: x - 60, y: y + 26, w: 120, h: 30 });
   }
   const chevauche = (r) =>
     occupe.some((o) => r.x < o.x + o.w && r.x + r.w > o.x && r.y < o.y + o.h && r.y + r.h > o.y);
@@ -261,10 +261,14 @@ export function dessinerTopologie(source, { simple = false } = {}) {
       const cote = (p.x - ctrl.x) * nx + (p.y - ctrl.y) * ny > 0 ? -1 : 1;
       ctrl = { x: ctrl.x + nx * 90 * cote, y: ctrl.y + ny * 90 * cote };
     }
-    // Les extrémités partent du bord de l'icône, dans la direction du trait.
+    // Les extrémités partent du bord de l'icône, dans la direction du trait. Vers le bas, le trait
+    // part sous le nom de l'équipement pour ne jamais le barrer.
     const bord = (depuis, vers) => {
       const d = Math.hypot(vers.x - depuis.x, vers.y - depuis.y) || 1;
-      return { x: depuis.x + ((vers.x - depuis.x) / d) * 28, y: depuis.y + ((vers.y - depuis.y) / d) * 28 };
+      const ux = (vers.x - depuis.x) / d;
+      const uy = (vers.y - depuis.y) / d;
+      if (uy > 0.35) return { x: depuis.x + ux * 20, y: depuis.y + 60 };
+      return { x: depuis.x + ux * 28, y: depuis.y + uy * 28 };
     };
     const p0 = bord(a, ctrl);
     const p2 = bord(b, ctrl);
@@ -274,7 +278,9 @@ export function dessinerTopologie(source, { simple = false } = {}) {
     });
 
     // Style : le trait le plus « sûr » du groupe l'emporte.
-    const certitude = liens.some((x) => x.certitude === "observe")
+    const certitude = liens.every((x) => x.certitude === "conseille")
+      ? "conseille"
+      : liens.some((x) => x.certitude === "observe")
       ? "observe"
       : liens.every((x) => x.certitude === "propose")
         ? "propose"
@@ -287,6 +293,7 @@ export function dessinerTopologie(source, { simple = false } = {}) {
       couleur = "var(--propose)";
       tirets = "7 5";
     }
+    if (certitude === "conseille" && !STYLE_CABLE[l.cable]) couleur = "var(--ok)";
     const titre = liens
       .map((x) => `${x.de} ${x.port_de || "?"} ↔ ${x.vers} ${x.port_vers || "?"} (${NOMS_CABLE[x.cable] ?? x.cable}, ${NOMS_CERTITUDE[x.certitude] ?? x.certitude})`)
       .join("\n");
@@ -377,6 +384,7 @@ export const NOMS_CERTITUDE = {
   observe: "vu sur la photo",
   deduit: "déduit, pas vu en entier",
   propose: "à ajouter pour que ça marche",
+  conseille: "à brancher ainsi",
 };
 
 // « Comment lire ce schéma » : seulement les éléments présents sur ce schéma.
@@ -388,6 +396,7 @@ export function rendreGuideSchema(r) {
     certitudes.has("observe") && `<span><i></i>trait plein : câble vu sur la photo</span>`,
     certitudes.has("deduit") && `<span><i class="deduit"></i>pointillés : câble déduit, pas vu en entier</span>`,
     certitudes.has("propose") && `<span><i class="propose"></i>orange : câble à ajouter pour que ça marche</span>`,
+    certitudes.has("conseille") && `<span><i class="conseille"></i>vert : câble du schéma conseillé</span>`,
     cables.has("console") && `<span><i class="console"></i>bleu clair : câble console (pour configurer)</span>`,
   ].filter(Boolean);
   return `<details class="guide-schema" open>

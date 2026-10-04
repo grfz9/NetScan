@@ -46,6 +46,7 @@ const etat = {
   photos: [], // { data, media_type, apercu }
   resultat: null,
   schemaSimple: false,
+  vueSchema: "actuel", // "actuel" (ce qui est branché) ou "conseille" (schéma proposé par NetScan)
   serveur: { cle: false, modele: "" }, // ce que dit /api/statut (absent sur GitHub Pages)
   compteClaude: null, // { sample, maxPhotos } quand la page tourne sur claude.ai
   messageCompteClaude: "Connexion à ton compte Claude…",
@@ -474,6 +475,7 @@ function afficherResultat(r, { demo = false } = {}) {
     </div>`;
 
   etat.schemaSimple = false;
+  etat.vueSchema = "actuel";
   $("#onglet-schema").innerHTML = rendreSchema(r);
   $("#onglet-config").innerHTML = rendreConfig(r);
   $("#onglet-diagnostic").innerHTML = rendreMaterielAPrevoir(r.materiel_a_prevoir) + rendreDiagnostic(d);
@@ -491,6 +493,15 @@ function rendreSchema(r) {
     ${equipementsReels(r).length ? `<button class="btn-mini" type="button" id="btn-ajouter-vus">Ajouter ces équipements à mon matériel</button>` : ""}
   </div>`;
 
+  const conseil = r.schema_propose;
+  if (conseil?.liens?.length) {
+    html += `<div class="bascule-schema" role="group" aria-label="Schéma affiché">
+      <button type="button" data-vue="actuel" aria-pressed="${etat.vueSchema === "actuel"}">Ce qui est branché</button>
+      <button type="button" data-vue="conseille" aria-pressed="${etat.vueSchema === "conseille"}">✓ Schéma conseillé</button>
+    </div>`;
+    if (etat.vueSchema === "conseille") return html + rendreSchemaConseille(conseil) + rendreCartesEquipements(r);
+  }
+
   if (r.equipements.length) {
     const complexe = schemaComplexe(r);
     const simple = complexe && etat.schemaSimple;
@@ -505,7 +516,29 @@ function rendreSchema(r) {
     </div>
     ${rendreConnexions(r)}`;
   }
+  return html + rendreCartesEquipements(r);
+}
 
+// Le schéma conseillé : même dessin, câbles en vert, avec le pourquoi et les changements à faire.
+function rendreSchemaConseille(sp) {
+  const vue = {
+    equipements: sp.equipements.map((e) => ({ ports: [], ...e })),
+    liens: sp.liens.map((l) => ({ ...l, certitude: "conseille" })),
+    diagnostic: { problemes: [] },
+  };
+  return `<div class="carte">
+      <h3>Schéma conseillé</h3>
+      ${sp.objectif ? `<p class="muted">Objectif : ${echapper(sp.objectif)}</p>` : ""}
+      <div class="defile">${dessinerTopologie(vue)}</div>
+      ${rendreGuideSchema(vue)}
+    </div>
+    ${sp.avantages.length ? `<div class="carte"><h3>Pourquoi c'est mieux</h3><ul class="avantages">${sp.avantages.map((a) => `<li>${echapper(a)}</li>`).join("")}</ul></div>` : ""}
+    ${sp.changements.length ? `<div class="carte"><h3>Ce qu'il faut changer</h3><ol class="changements">${sp.changements.map((c) => `<li>${echapper(c)}</li>`).join("")}</ol></div>` : ""}
+    ${rendreConnexions(vue)}`;
+}
+
+function rendreCartesEquipements(r) {
+  let html = "";
   r.equipements.forEach((e, i) => {
     const conf = { haute: "ok", moyenne: "warn", faible: "ko" }[e.confiance] ?? "";
     html += `<div class="carte" id="equipement-${i}">
@@ -782,6 +815,14 @@ $("#vue-resultat").addEventListener("click", async (e) => {
     return toast(`${n} équipement${n > 1 ? "s" : ""} ajouté${n > 1 ? "s" : ""} à ton matériel.`);
   }
   if (e.target.id === "btn-demo-reglages") return modeAnalyse() || SUR_CLAUDE_AI ? afficherVue("accueil") : afficherReglages();
+  const vue = e.target.closest("[data-vue]")?.dataset.vue;
+  if (vue) {
+    etat.vueSchema = vue;
+    const defilement = window.scrollY;
+    $("#onglet-schema").innerHTML = rendreSchema(etat.resultat);
+    window.scrollTo({ top: defilement });
+    return;
+  }
   if (e.target.id === "btn-simplifier") {
     etat.schemaSimple = !etat.schemaSimple;
     const defilement = window.scrollY;
