@@ -54,6 +54,13 @@ Propose un schéma et une configuration réalisables avec ce matériel (nombre e
   return texte;
 }
 
+function textePhotos(n) {
+  if (n === 0) {
+    return `Aucune photo n'est jointe : l'étudiant décrit son installation par écrit dans la consigne ci-dessus. Base-toi uniquement sur cette description, sans inventer ce qu'elle ne dit pas. Mets type_image à "schema_topologie", qualite_image.niveau à "bonne", et précise dans limites que l'analyse repose sur une description écrite.`;
+  }
+  return `${n} photo${n > 1 ? "s sont jointes" : " est jointe"}.`;
+}
+
 export function nettoyerMateriel(liste) {
   return (Array.isArray(liste) ? liste : [])
     .filter((m) => m && typeof m.nom === "string" && m.nom.trim())
@@ -79,7 +86,7 @@ export async function analyserAvec(
     type: "image",
     source: { type: "base64", media_type: img.media_type, data: img.data },
   }));
-  contenu.push({ type: "text", text: texteContexte(contexte, nettoyerMateriel(materiel)) });
+  contenu.push({ type: "text", text: `${texteContexte(contexte, nettoyerMateriel(materiel))}\n\n${textePhotos(images.length)}` });
 
   const stream = client.beta.messages.stream({
     model: modele,
@@ -164,14 +171,14 @@ export async function analyserAvecCompteClaude(sample, { images, contexte, mater
 
 ${texteContexte(contexte, nettoyerMateriel(materiel))}
 
-${images.length} photo${images.length > 1 ? "s sont jointes" : " est jointe"}.
+${textePhotos(images.length)}
 Réponds uniquement avec un objet JSON, sans aucun texte autour, qui respecte exactement ce schéma JSON (toutes les propriétés sont obligatoires) :
 ${JSON.stringify(SCHEMA_ANALYSE)}`;
 
   onEtape("reflexion");
   const progression = suivreProgression(onEtape);
   const reponse = await sample.json(consigne, {
-    images,
+    ...(images.length ? { images } : {}),
     modelTier: "complex",
     onText: ({ text }) => progression(text),
   });
