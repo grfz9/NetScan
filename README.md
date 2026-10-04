@@ -24,6 +24,18 @@ La clé est enregistrée uniquement dans ton navigateur, sur ton appareil, et n'
 
 Sans clé, le bouton **« Voir un exemple sans clé API »** montre une analyse complète de démonstration.
 
+## Version sans clé API, sur claude.ai
+
+NetScan existe aussi en page claude.ai : l'analyse passe alors par **ton compte Claude** (ton abonnement), sans clé API ni crédit. Elle ne fonctionne que pour les personnes connectées à claude.ai avec qui la page est partagée.
+
+Pour la reconstruire après une modification :
+
+```bash
+node scripts/build-artifact.mjs
+```
+
+puis republier le dossier `artifact/` avec les fichiers de `public/` (Claude Code s'en charge).
+
 ## Lancer en local (avec le serveur Node)
 
 Il faut [Node.js](https://nodejs.org) 20.12 ou plus récent.
@@ -84,7 +96,8 @@ config, diagnostic, étapes  ◀─résultat───┘
 | Fichier | Rôle |
 |---|---|
 | `server.js` | Serveur Express : sert l'interface et l'API `/api/analyse` |
-| `public/coeur.js` | Consigne envoyée à Claude et appel à l'API en streaming (partagé par le serveur et le navigateur) |
+| `public/coeur.js` | Consigne envoyée à Claude, appel à l'API en streaming, et version claude.ai sans clé (partagé partout) |
+| `scripts/build-artifact.mjs` | Fabrique la page claude.ai à partir de `public/index.html` |
 | `public/schema.js` | Schéma JSON que la réponse doit respecter (équipements, ports, liens, config, diagnostic, étapes) |
 | `src/analyse.js` | Branche le cœur de l'analyse sur la clé du serveur |
 | `public/app.js` | Interface : photos, envoi, onglets, réglages, historique |

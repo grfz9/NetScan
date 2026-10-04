@@ -1,5 +1,12 @@
 import { echapper, icone, NOMS_TYPE, dessinerTopologie, dessinerFacade, colorerCommandes, schemaComplexe } from "./rendu.js";
-import { MAX_PHOTOS, MODELE_PAR_DEFAUT, analyserAvec, messageErreur } from "./coeur.js";
+import {
+  MAX_PHOTOS,
+  MODELE_PAR_DEFAUT,
+  analyserAvec,
+  messageErreur,
+  analyserAvecCompteClaude,
+  messageErreurCompteClaude,
+} from "./coeur.js";
 
 const $ = (sel) => document.querySelector(sel);
 const CLE_HISTORIQUE = "netscan.historique";
@@ -13,6 +20,7 @@ const etat = {
   resultat: null,
   schemaSimple: false,
   serveur: { cle: false, modele: "" }, // ce que dit /api/statut (absent sur GitHub Pages)
+  compteClaude: null, // { sample, maxPhotos } quand la page tourne sur claude.ai
 };
 
 /* ---------- Stockage local (peut être bloqué en navigation privée) ---------- */
@@ -38,8 +46,10 @@ function ecrire(cle, valeur) {
 const modeleChoisi = () => lire(CLE_MODELE) || MODELE_PAR_DEFAUT;
 
 // "serveur" si le serveur Node a sa propre clé, "navigateur" si une clé est enregistrée ici.
+// "claude" si la page est ouverte sur claude.ai : c'est le compte Claude qui analyse, sans clé.
 function modeAnalyse() {
   if (etat.serveur.cle) return "serveur";
+  if (etat.compteClaude) return "claude";
   if (lire(CLE_API)) return "navigateur";
   return null;
 }
@@ -135,8 +145,8 @@ async function miniatureDepuis(dataUrl, cote = 160) {
 
 async function ajouterPhotos(fichiers) {
   for (const f of fichiers) {
-    if (etat.photos.length >= MAX_PHOTOS) {
-      toast(`${MAX_PHOTOS} photos maximum.`);
+    if (etat.photos.length >= maxPhotos()) {
+      toast(`${maxPhotos()} photos maximum.`);
       break;
     }
     try {
@@ -200,7 +210,7 @@ async function lancerAnalyse() {
   afficherVue("chargement");
 
   try {
-    const analyser = mode === "serveur" ? analyserViaServeur : analyserDansNavigateur;
+    const analyser = { serveur: analyserViaServeur, claude: analyserViaCompteClaude, navigateur: analyserDansNavigateur }[mode];
     const resultat = await analyser({ images, contexte, onEtape: marquerEtape });
     const vignette = await miniatureDepuis(etat.photos[0].apercu).catch(() => "");
     enregistrerHistorique({ resultat, contexte, vignette });
@@ -208,6 +218,21 @@ async function lancerAnalyse() {
   } catch (err) {
     afficherVue("accueil");
     toast(err.message || "L'analyse a échoué.", true);
+  }
+}
+
+const maxPhotos = () => etat.compteClaude?.maxPhotos ?? MAX_PHOTOS;
+
+// Mode claude.ai : les photos partent avec le compte Claude de la personne (aucune clé).
+async function analyserViaCompteClaude({ images, contexte, onEtape }) {
+  const fichiers = images.map(({ data, media_type }) => {
+    const octets = Uint8Array.from(atob(data), (c) => c.charCodeAt(0));
+    return new Blob([octets], { type: media_type });
+  });
+  try {
+    return await analyserAvecCompteClaude(etat.compteClaude.sample, { images: fichiers, contexte, onEtape });
+  } catch (err) {
+    throw new Error(messageErreurCompteClaude(err));
   }
 }
 
@@ -332,6 +357,7 @@ function rendreQualite(q) {
 function afficherResultat(r, { demo = false } = {}) {
   etat.resultat = r;
   $("#bandeau-demo").hidden = !demo;
+  $("#btn-demo-reglages").textContent = modeAnalyse() ? "Analyser ma photo" : "Ajouter ma clé API";
   rendreQualite(r.qualite_image);
   const d = r.diagnostic ?? { statut: "indeterminable", resume: "", problemes: [], verifications: [] };
   const statut = r.type_image === "hors_sujet" ? "indeterminable" : d.statut;
@@ -647,7 +673,7 @@ $("#vue-resultat").addEventListener("click", async (e) => {
     return;
   }
   if (e.target.id === "btn-reprendre") return afficherVue("accueil");
-  if (e.target.id === "btn-demo-reglages") return afficherReglages();
+  if (e.target.id === "btn-demo-reglages") return modeAnalyse() ? afficherVue("accueil") : afficherReglages();
   if (e.target.id === "btn-simplifier") {
     etat.schemaSimple = !etat.schemaSimple;
     const defilement = window.scrollY;
@@ -676,6 +702,10 @@ $("#vue-resultat").addEventListener("keydown", (e) => {
 /* ---------- Réglages ---------- */
 
 function afficherReglages() {
+  const surClaude = Boolean(etat.compteClaude);
+  $("#carte-compte").hidden = !surClaude;
+  $("#carte-cle").hidden = surClaude;
+  $("#carte-modele").hidden = surClaude;
   $("#cle-api").value = "";
   $("#choix-modele").value = modeleChoisi();
   majEtatCle();
@@ -697,6 +727,8 @@ function majStatut() {
   const mode = modeAnalyse();
   if (mode === "serveur") {
     el.textContent = `Analyse par le serveur (${etat.serveur.modele}).`;
+  } else if (mode === "claude") {
+    el.textContent = `Analyse avec ton compte Claude, sans clé API · ${maxPhotos()} photos max.`;
   } else if (mode === "navigateur") {
     el.textContent = `Clé API enregistrée sur cet appareil · ${$("#choix-modele").selectedOptions[0].text.split(" —")[0]}`;
   } else {
@@ -742,6 +774,21 @@ fetch("api/statut")
   })
   .catch(() => {});
 
-if ("serviceWorker" in navigator && window.isSecureContext) {
+// Sur claude.ai, la page peut demander à Claude d'analyser les photos avec le compte de la personne.
+if (window.claude?.use) {
+  window.claude
+    .use("sample")
+    .then(async (sample) => {
+      if (!sample) return;
+      const limites = await sample.limits().catch(() => null);
+      if (!limites?.images) return;
+      etat.compteClaude = { sample, maxPhotos: Math.min(MAX_PHOTOS, limites.images.maxCount) };
+      $("#aide-photos").textContent = `Tu peux ajouter jusqu'à ${maxPhotos()} photos : la façade de chaque équipement, l'arrière, l'écran de config, le schéma du TP…`;
+      majStatut();
+    })
+    .catch(() => {});
+}
+
+if ("serviceWorker" in navigator && window.isSecureContext && !window.claude) {
   navigator.serviceWorker.register("sw.js").catch(() => {});
 }

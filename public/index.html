@@ -78,7 +78,7 @@
     <section id="vue-resultat" class="vue" hidden>
       <div id="bandeau-demo" class="bandeau-demo" hidden>
         <strong>Exemple de démonstration</strong>
-        <p>Ce résultat est un exemple fixe : ce n'est pas l'analyse de ta photo. Pour analyser tes propres photos, ajoute ta clé API.</p>
+        <p>Ce résultat est un exemple fixe : ce n'est pas l'analyse de ta photo.</p>
         <button type="button" class="btn-mini" id="btn-demo-reglages">Ajouter ma clé API</button>
       </div>
       <div id="alerte-qualite" hidden></div>
@@ -99,7 +99,11 @@
     <!-- Réglages -->
     <section id="vue-reglages" class="vue" hidden>
       <h2>Réglages</h2>
-      <div class="carte">
+      <div class="carte" id="carte-compte" hidden>
+        <h3>Ton compte Claude</h3>
+        <p class="muted">Sur claude.ai, NetScan utilise directement ton compte Claude : pas besoin de clé API ni de crédit. Chaque analyse compte dans l'utilisation de ton abonnement. La première fois, Claude te demande d'autoriser la page.</p>
+      </div>
+      <div class="carte" id="carte-cle">
         <h3>Clé API Anthropic</h3>
         <p class="muted">Nécessaire pour analyser tes photos. Elle est enregistrée uniquement sur cet appareil, et envoyée seulement à l'API d'Anthropic. Elle n'est jamais publiée sur GitHub.</p>
         <label class="champ" for="cle-api">
@@ -120,7 +124,7 @@
           </ol>
         </details>
       </div>
-      <div class="carte">
+      <div class="carte" id="carte-modele">
         <h3>Modèle</h3>
         <label class="champ" for="choix-modele">
           <span>Modèle utilisé pour l'analyse</span>
