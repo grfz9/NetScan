@@ -15,7 +15,7 @@ L'analyse d'image est faite par l'API Claude (Anthropic), avec une réponse au f
 Il faut [Node.js](https://nodejs.org) 20.12 ou plus récent.
 
 ```bash
-git clone https://github.com/billalk/NetScan.git
+git clone https://github.com/grfz9/NetScan.git
 cd NetScan
 npm install
 cp .env.example .env    # puis colle ta clé dans ANTHROPIC_API_KEY
