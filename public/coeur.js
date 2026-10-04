@@ -22,6 +22,7 @@ Ce que tu dois produire :
    - "indeterminable" si la photo ne montre que du matériel sans configuration ni consigne : explique alors ce qu'il faudrait pour conclure.
 6. Vérifications : les commandes à taper pour prouver que ça marche (show ip interface brief, show vlan brief, ping, ipconfig...).
 7. Étapes : explique ton raisonnement étape par étape, comme Photomath : ce que tu observes, puis ce que tu en déduis.
+8. Schéma conseillé (schema_propose) : propose le câblage le plus simple, fiable et propre qui atteint l'objectif, avec le matériel visible et le matériel disponible : hiérarchie claire (Internet → routeur → switch → postes), bons types de câbles, un seul chemin entre deux équipements sauf redondance voulue, ports cohérents, VLAN seulement s'ils servent. Donne tout le câblage (pas seulement les différences), explique simplement pourquoi c'est mieux, puis la liste ordonnée des changements à faire. Si l'existant est déjà optimal, reprends-le et dis-le dans avantages. Si tu proposes une configuration, elle doit correspondre à ce schéma conseillé.
 
 Règles :
 - Honnêteté avant tout : distingue toujours ce qui est observé, déduit ou proposé. N'invente jamais un port, une étiquette ou une ligne de configuration illisible.
@@ -249,6 +250,16 @@ export function normaliser(r) {
     },
     etapes: liste(r.etapes),
     materiel_a_prevoir: liste(r.materiel_a_prevoir).filter((m) => m && texte(m.element)),
+    schema_propose: (() => {
+      const sp = objet(r.schema_propose);
+      return {
+        objectif: texte(sp.objectif),
+        equipements: liste(sp.equipements).filter((e) => e && texte(e.id)),
+        liens: liste(sp.liens).filter((l) => l && texte(l.de) && texte(l.vers)),
+        avantages: liste(sp.avantages).filter((x) => texte(x)),
+        changements: liste(sp.changements).filter((x) => texte(x)),
+      };
+    })(),
     limites: texte(r.limites),
   };
 }

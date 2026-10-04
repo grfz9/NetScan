@@ -2,7 +2,9 @@
   "type_image": "mixte",
   "qualite_image": {
     "niveau": "moyenne",
-    "problemes": ["reflets"],
+    "problemes": [
+      "reflets"
+    ],
     "detail": "Un reflet sur l'écran du PC de console cache la fin de la configuration du routeur.",
     "conseil": "Photographie l'écran un peu de côté pour éviter le reflet, ou fais une capture d'écran directement sur le PC."
   },
@@ -18,12 +20,48 @@
       "confiance": "haute",
       "role": "Passerelle des deux VLAN : il route le trafic entre le VLAN 10 et le VLAN 20 grâce aux sous-interfaces.",
       "ports": [
-        { "nom": "Gi0/0", "type": "ethernet", "etat": "libre", "source": "visible", "detail": "LED éteinte" },
-        { "nom": "Gi0/1", "type": "ethernet", "etat": "connecte", "source": "visible", "detail": "Câble bleu vers SW1 — LED éteinte : interface en shutdown" },
-        { "nom": "Gi0/2", "type": "ethernet", "etat": "libre", "source": "visible", "detail": "" },
-        { "nom": "Console", "type": "console", "etat": "connecte", "source": "visible", "detail": "Câble console bleu clair vers le PC de TP" },
-        { "nom": "AUX", "type": "console", "etat": "libre", "source": "visible", "detail": "" },
-        { "nom": "USB0", "type": "usb", "etat": "libre", "source": "visible", "detail": "" }
+        {
+          "nom": "Gi0/0",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": "LED éteinte"
+        },
+        {
+          "nom": "Gi0/1",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "Câble bleu vers SW1 — LED éteinte : interface en shutdown"
+        },
+        {
+          "nom": "Gi0/2",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "Console",
+          "type": "console",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "Câble console bleu clair vers le PC de TP"
+        },
+        {
+          "nom": "AUX",
+          "type": "console",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "USB0",
+          "type": "usb",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        }
       ]
     },
     {
@@ -35,33 +73,195 @@
       "confiance": "haute",
       "role": "Switch d'accès : relie les PC et transporte les VLAN 10 et 20 vers le routeur.",
       "ports": [
-        { "nom": "Fa0/1", "type": "ethernet", "etat": "connecte", "source": "visible", "detail": "PC1 — VLAN 10 (access)" },
-        { "nom": "Fa0/2", "type": "ethernet", "etat": "libre", "source": "visible", "detail": "" },
-        { "nom": "Fa0/3", "type": "ethernet", "etat": "libre", "source": "visible", "detail": "" },
-        { "nom": "Fa0/4", "type": "ethernet", "etat": "libre", "source": "visible", "detail": "" },
-        { "nom": "Fa0/5", "type": "ethernet", "etat": "libre", "source": "visible", "detail": "" },
-        { "nom": "Fa0/6", "type": "ethernet", "etat": "libre", "source": "visible", "detail": "" },
-        { "nom": "Fa0/7", "type": "ethernet", "etat": "libre", "source": "visible", "detail": "" },
-        { "nom": "Fa0/8", "type": "ethernet", "etat": "libre", "source": "visible", "detail": "" },
-        { "nom": "Fa0/9", "type": "ethernet", "etat": "libre", "source": "visible", "detail": "" },
-        { "nom": "Fa0/10", "type": "ethernet", "etat": "libre", "source": "visible", "detail": "" },
-        { "nom": "Fa0/11", "type": "ethernet", "etat": "connecte", "source": "visible", "detail": "PC2 — devrait être en VLAN 20" },
-        { "nom": "Fa0/12", "type": "ethernet", "etat": "libre", "source": "visible", "detail": "" },
-        { "nom": "Fa0/13", "type": "ethernet", "etat": "libre", "source": "visible", "detail": "" },
-        { "nom": "Fa0/14", "type": "ethernet", "etat": "libre", "source": "visible", "detail": "" },
-        { "nom": "Fa0/15", "type": "ethernet", "etat": "libre", "source": "visible", "detail": "" },
-        { "nom": "Fa0/16", "type": "ethernet", "etat": "libre", "source": "visible", "detail": "" },
-        { "nom": "Fa0/17", "type": "ethernet", "etat": "libre", "source": "visible", "detail": "" },
-        { "nom": "Fa0/18", "type": "ethernet", "etat": "libre", "source": "visible", "detail": "" },
-        { "nom": "Fa0/19", "type": "ethernet", "etat": "libre", "source": "visible", "detail": "" },
-        { "nom": "Fa0/20", "type": "ethernet", "etat": "libre", "source": "visible", "detail": "" },
-        { "nom": "Fa0/21", "type": "ethernet", "etat": "libre", "source": "visible", "detail": "" },
-        { "nom": "Fa0/22", "type": "ethernet", "etat": "libre", "source": "visible", "detail": "" },
-        { "nom": "Fa0/23", "type": "ethernet", "etat": "libre", "source": "visible", "detail": "" },
-        { "nom": "Fa0/24", "type": "ethernet", "etat": "libre", "source": "visible", "detail": "" },
-        { "nom": "Gi0/1", "type": "ethernet", "etat": "connecte", "source": "visible", "detail": "Uplink vers R1 — doit être en trunk" },
-        { "nom": "Gi0/2", "type": "ethernet", "etat": "libre", "source": "visible", "detail": "" },
-        { "nom": "Console", "type": "console", "etat": "libre", "source": "visible", "detail": "" }
+        {
+          "nom": "Fa0/1",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "PC1 — VLAN 10 (access)"
+        },
+        {
+          "nom": "Fa0/2",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "Fa0/3",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "Fa0/4",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "Fa0/5",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "Fa0/6",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "Fa0/7",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "Fa0/8",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "Fa0/9",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "Fa0/10",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "Fa0/11",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "PC2 — devrait être en VLAN 20"
+        },
+        {
+          "nom": "Fa0/12",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "Fa0/13",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "Fa0/14",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "Fa0/15",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "Fa0/16",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "Fa0/17",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "Fa0/18",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "Fa0/19",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "Fa0/20",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "Fa0/21",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "Fa0/22",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "Fa0/23",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "Fa0/24",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "Gi0/1",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "Uplink vers R1 — doit être en trunk"
+        },
+        {
+          "nom": "Gi0/2",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "Console",
+          "type": "console",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        }
       ]
     },
     {
@@ -72,7 +272,15 @@
       "modele": "",
       "confiance": "moyenne",
       "role": "Poste client du VLAN 10.",
-      "ports": [{ "nom": "Eth0", "type": "ethernet", "etat": "connecte", "source": "deduit", "detail": "192.168.10.10/24 — passerelle 192.168.10.1" }]
+      "ports": [
+        {
+          "nom": "Eth0",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "deduit",
+          "detail": "192.168.10.10/24 — passerelle 192.168.10.1"
+        }
+      ]
     },
     {
       "id": "PC2",
@@ -82,13 +290,45 @@
       "modele": "",
       "confiance": "moyenne",
       "role": "Poste client du VLAN 20.",
-      "ports": [{ "nom": "Eth0", "type": "ethernet", "etat": "connecte", "source": "deduit", "detail": "192.168.20.10/24 — passerelle absente" }]
+      "ports": [
+        {
+          "nom": "Eth0",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "deduit",
+          "detail": "192.168.20.10/24 — passerelle absente"
+        }
+      ]
     }
   ],
   "liens": [
-    { "de": "R1", "port_de": "Gi0/1", "vers": "SW1", "port_vers": "Gi0/1", "cable": "droit", "certitude": "observe", "remarque": "Câble droit : correct entre un routeur et un switch." },
-    { "de": "SW1", "port_de": "Fa0/1", "vers": "PC1", "port_vers": "Eth0", "cable": "droit", "certitude": "observe", "remarque": "" },
-    { "de": "SW1", "port_de": "Fa0/11", "vers": "PC2", "port_vers": "Eth0", "cable": "droit", "certitude": "observe", "remarque": "" }
+    {
+      "de": "R1",
+      "port_de": "Gi0/1",
+      "vers": "SW1",
+      "port_vers": "Gi0/1",
+      "cable": "droit",
+      "certitude": "observe",
+      "remarque": "Câble droit : correct entre un routeur et un switch."
+    },
+    {
+      "de": "SW1",
+      "port_de": "Fa0/1",
+      "vers": "PC1",
+      "port_vers": "Eth0",
+      "cable": "droit",
+      "certitude": "observe",
+      "remarque": ""
+    },
+    {
+      "de": "SW1",
+      "port_de": "Fa0/11",
+      "vers": "PC2",
+      "port_vers": "Eth0",
+      "cable": "droit",
+      "certitude": "observe",
+      "remarque": ""
+    }
   ],
   "configuration": {
     "source": "mixte",
@@ -133,56 +373,173 @@
       {
         "titre": "Interface Gi0/1 du routeur en shutdown",
         "gravite": "bloquant",
-        "concerne": ["R1"],
+        "concerne": [
+          "R1"
+        ],
         "explication": "La LED de Gi0/1 est éteinte alors qu'un câble est branché, et « no shutdown » n'apparaît pas dans la configuration lue. Les sous-interfaces .10 et .20 sont donc inactives.",
         "correction": "interface GigabitEthernet0/1\n no shutdown"
       },
       {
         "titre": "Pas de trunk entre SW1 et R1",
         "gravite": "bloquant",
-        "concerne": ["SW1", "R1"],
+        "concerne": [
+          "SW1",
+          "R1"
+        ],
         "explication": "Pour le router-on-a-stick, le port du switch relié au routeur doit être en trunk 802.1Q. Sinon il ne transporte que le VLAN 1.",
         "correction": "interface GigabitEthernet0/1\n switchport mode trunk\n switchport trunk allowed vlan 10,20"
       },
       {
         "titre": "Port de PC2 dans le mauvais VLAN",
         "gravite": "bloquant",
-        "concerne": ["SW1", "PC2"],
+        "concerne": [
+          "SW1",
+          "PC2"
+        ],
         "explication": "Fa0/11 est encore dans le VLAN 1 par défaut alors que PC2 utilise une adresse du VLAN 20.",
         "correction": "interface FastEthernet0/11\n switchport mode access\n switchport access vlan 20"
       },
       {
         "titre": "Passerelle par défaut absente sur PC2",
         "gravite": "important",
-        "concerne": ["PC2"],
+        "concerne": [
+          "PC2"
+        ],
         "explication": "Sans passerelle, PC2 peut joindre son propre réseau mais pas le VLAN 10.",
         "correction": "Passerelle : 192.168.20.1 (dans les paramètres IP de PC2)"
       },
       {
         "titre": "Aucun mot de passe sur les accès",
         "gravite": "conseil",
-        "concerne": ["R1", "SW1"],
+        "concerne": [
+          "R1",
+          "SW1"
+        ],
         "explication": "Ce n'est pas nécessaire pour le ping, mais c'est attendu dans un TP noté.",
         "correction": "enable secret Cisco123!\nline console 0\n password Cisco123!\n login"
       }
     ],
     "verifications": [
-      { "equipement": "R1", "commande": "show ip interface brief", "attendu": "Gi0/1, Gi0/1.10 et Gi0/1.20 en « up / up »." },
-      { "equipement": "SW1", "commande": "show interfaces trunk", "attendu": "Gi0/1 en mode trunk avec les VLAN 10 et 20 autorisés." },
-      { "equipement": "SW1", "commande": "show vlan brief", "attendu": "Fa0/1 dans le VLAN 10, Fa0/11 dans le VLAN 20." },
-      { "equipement": "PC1", "commande": "ping 192.168.20.10", "attendu": "Des réponses : le routage inter-VLAN fonctionne." }
+      {
+        "equipement": "R1",
+        "commande": "show ip interface brief",
+        "attendu": "Gi0/1, Gi0/1.10 et Gi0/1.20 en « up / up »."
+      },
+      {
+        "equipement": "SW1",
+        "commande": "show interfaces trunk",
+        "attendu": "Gi0/1 en mode trunk avec les VLAN 10 et 20 autorisés."
+      },
+      {
+        "equipement": "SW1",
+        "commande": "show vlan brief",
+        "attendu": "Fa0/1 dans le VLAN 10, Fa0/11 dans le VLAN 20."
+      },
+      {
+        "equipement": "PC1",
+        "commande": "ping 192.168.20.10",
+        "attendu": "Des réponses : le routage inter-VLAN fonctionne."
+      }
     ]
   },
   "etapes": [
-    { "titre": "J'identifie le matériel", "detail": "Le logo et la façade (3 ports Gigabit, port console bleu, port AUX) correspondent à un Cisco ISR 2911. Le switch porte l'étiquette WS-C2960-24TT-L : 24 ports FastEthernet et 2 ports Gigabit." },
-    { "titre": "Je suis les câbles", "detail": "Un câble bleu relie Gi0/1 du routeur à Gi0/1 du switch. Deux câbles partent des ports Fa0/1 et Fa0/11 vers les PC. Ce sont des câbles droits, ce qui est correct entre des équipements de types différents." },
-    { "titre": "Je lis l'écran", "detail": "On voit deux sous-interfaces Gi0/1.10 et Gi0/1.20 avec « encapsulation dot1Q » : c'est un routage inter-VLAN « router-on-a-stick »." },
-    { "titre": "Je compare les LED et la configuration", "detail": "La LED de Gi0/1 sur le routeur est éteinte alors qu'un câble est branché : l'interface est très probablement en shutdown, et la configuration lue ne contient pas « no shutdown »." },
-    { "titre": "Je vérifie ce qu'il faut côté switch", "detail": "Pour que le routeur reçoive les deux VLAN, le port Gi0/1 du switch doit être en trunk, et chaque PC doit être dans le bon VLAN. Rien ne le montre sur la photo : je l'ajoute à la configuration." },
-    { "titre": "Je conclus", "detail": "En l'état, PC1 ne peut pas pinger PC2. Avec les trois corrections bloquantes et la passerelle de PC2, le ping doit passer." }
+    {
+      "titre": "J'identifie le matériel",
+      "detail": "Le logo et la façade (3 ports Gigabit, port console bleu, port AUX) correspondent à un Cisco ISR 2911. Le switch porte l'étiquette WS-C2960-24TT-L : 24 ports FastEthernet et 2 ports Gigabit."
+    },
+    {
+      "titre": "Je suis les câbles",
+      "detail": "Un câble bleu relie Gi0/1 du routeur à Gi0/1 du switch. Deux câbles partent des ports Fa0/1 et Fa0/11 vers les PC. Ce sont des câbles droits, ce qui est correct entre des équipements de types différents."
+    },
+    {
+      "titre": "Je lis l'écran",
+      "detail": "On voit deux sous-interfaces Gi0/1.10 et Gi0/1.20 avec « encapsulation dot1Q » : c'est un routage inter-VLAN « router-on-a-stick »."
+    },
+    {
+      "titre": "Je compare les LED et la configuration",
+      "detail": "La LED de Gi0/1 sur le routeur est éteinte alors qu'un câble est branché : l'interface est très probablement en shutdown, et la configuration lue ne contient pas « no shutdown »."
+    },
+    {
+      "titre": "Je vérifie ce qu'il faut côté switch",
+      "detail": "Pour que le routeur reçoive les deux VLAN, le port Gi0/1 du switch doit être en trunk, et chaque PC doit être dans le bon VLAN. Rien ne le montre sur la photo : je l'ajoute à la configuration."
+    },
+    {
+      "titre": "Je conclus",
+      "detail": "En l'état, PC1 ne peut pas pinger PC2. Avec les trois corrections bloquantes et la passerelle de PC2, le ping doit passer."
+    }
   ],
   "materiel_a_prevoir": [
-    { "element": "Câble console RJ45 vers USB", "quantite": "1", "raison": "Pour configurer SW1 en même temps que R1. Sinon, déplace le câble console d'un équipement à l'autre." }
+    {
+      "element": "Câble console RJ45 vers USB",
+      "quantite": "1",
+      "raison": "Pour configurer SW1 en même temps que R1. Sinon, déplace le câble console d'un équipement à l'autre."
+    }
   ],
-  "limites": "La configuration complète du switch n'est pas visible : le trunk et les VLAN ont été déduits de la consigne. Une photo de « show running-config » sur SW1 permettrait de le confirmer."
+  "limites": "La configuration complète du switch n'est pas visible : le trunk et les VLAN ont été déduits de la consigne. Une photo de « show running-config » sur SW1 permettrait de le confirmer.",
+  "schema_propose": {
+    "objectif": "PC1 (VLAN 10) et PC2 (VLAN 20) doivent communiquer à travers le routeur.",
+    "equipements": [
+      {
+        "id": "R1",
+        "nom": "Routeur Cisco ISR 2911",
+        "type": "routeur",
+        "modele": "ISR 2911"
+      },
+      {
+        "id": "SW1",
+        "nom": "Switch Cisco Catalyst 2960",
+        "type": "switch",
+        "modele": "WS-C2960-24TT-L"
+      },
+      {
+        "id": "PC1",
+        "nom": "PC de TP (VLAN 10)",
+        "type": "pc",
+        "modele": ""
+      },
+      {
+        "id": "PC2",
+        "nom": "PC de TP (VLAN 20)",
+        "type": "pc",
+        "modele": ""
+      }
+    ],
+    "liens": [
+      {
+        "de": "R1",
+        "port_de": "Gi0/1",
+        "vers": "SW1",
+        "port_vers": "Gi0/1",
+        "cable": "droit",
+        "remarque": "Lien trunk : transporte les VLAN 10 et 20 vers le routeur"
+      },
+      {
+        "de": "SW1",
+        "port_de": "Fa0/1",
+        "vers": "PC1",
+        "port_vers": "Eth0",
+        "cable": "droit",
+        "remarque": "Port d'accès VLAN 10"
+      },
+      {
+        "de": "SW1",
+        "port_de": "Fa0/11",
+        "vers": "PC2",
+        "port_vers": "Eth0",
+        "cable": "droit",
+        "remarque": "Port d'accès VLAN 20"
+      }
+    ],
+    "avantages": [
+      "Un seul câble entre le routeur et le switch suffit pour les deux VLAN grâce au trunk : on économise un port du routeur.",
+      "Chaque PC est dans son VLAN : les deux réseaux restent séparés, et le routeur décide ce qui passe de l'un à l'autre.",
+      "Le câblage reste le même qu'aujourd'hui : il suffit de corriger la configuration."
+    ],
+    "changements": [
+      "Garder le câble R1 Gi0/1 ⟷ SW1 Gi0/1, mais passer Gi0/1 du switch en mode trunk.",
+      "Allumer l'interface Gi0/1 du routeur (no shutdown).",
+      "Mettre le port Fa0/11 du switch dans le VLAN 20.",
+      "Donner la passerelle 192.168.20.1 à PC2."
+    ]
+  }
 }
