@@ -78,6 +78,25 @@ function suivreProgression(onEtape) {
   };
 }
 
+// Le format de réponse est donné dans la consigne : l'imposer côté API (structured outputs)
+// est refusé, le schéma étant trop riche (« compiled grammar is too large »).
+const CONSIGNE_FORMAT = `Réponds uniquement avec un objet JSON, sans aucun texte ni balise Markdown autour, qui respecte exactement ce schéma JSON (toutes les propriétés sont obligatoires, les valeurs "enum" sont les seules autorisées) :
+${JSON.stringify(SCHEMA_ANALYSE)}`;
+
+// Lit l'objet JSON de la réponse, même entouré d'un bloc ```json ou d'une phrase.
+export function extraireJSON(texte) {
+  const essais = [texte, texte.match(/```(?:json)?\s*([\s\S]*?)```/)?.[1], texte.slice(texte.indexOf("{"), texte.lastIndexOf("}") + 1)];
+  for (const essai of essais) {
+    if (!essai) continue;
+    try {
+      return JSON.parse(essai);
+    } catch {
+      // essai suivant
+    }
+  }
+  throw new ErreurAnalyse("La réponse de Claude n'a pas pu être lue. Réessaie.");
+}
+
 export async function analyserAvec(
   client,
   { images, contexte, materiel, modele = MODELE_PAR_DEFAUT, effort = EFFORT_PAR_DEFAUT, onEtape = () => {} }
@@ -93,11 +112,10 @@ export async function analyserAvec(
     max_tokens: 64000,
     betas: ["server-side-fallback-2026-07-01"],
     fallbacks: "default",
-    output_config: {
-      effort,
-      format: { type: "json_schema", schema: SCHEMA_ANALYSE },
-    },
-    system: SYSTEME,
+    output_config: { effort },
+    system: `${SYSTEME}
+
+${CONSIGNE_FORMAT}`,
     messages: [{ role: "user", content: contenu }],
   });
 
@@ -125,11 +143,7 @@ export async function analyserAvec(
     .filter((b) => b.type === "text")
     .map((b) => b.text)
     .join("");
-  try {
-    return { resultat: normaliser(JSON.parse(json)), modele: message.model, usage: message.usage };
-  } catch {
-    throw new ErreurAnalyse("La réponse de Claude n'était pas un JSON valide. Réessaie.");
-  }
+  return { resultat: normaliser(extraireJSON(json)), modele: message.model, usage: message.usage };
 }
 
 // Traduit une erreur du SDK en message compréhensible. `Anthropic` = la classe du SDK utilisée.
@@ -172,8 +186,8 @@ export async function analyserAvecCompteClaude(sample, { images, contexte, mater
 ${texteContexte(contexte, nettoyerMateriel(materiel))}
 
 ${textePhotos(images.length)}
-Réponds uniquement avec un objet JSON, sans aucun texte autour, qui respecte exactement ce schéma JSON (toutes les propriétés sont obligatoires) :
-${JSON.stringify(SCHEMA_ANALYSE)}`;
+
+${CONSIGNE_FORMAT}`;
 
   onEtape("reflexion");
   const progression = suivreProgression(onEtape);
