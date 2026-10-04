@@ -62,10 +62,11 @@ export function icone(type, taille = 48, x = 0, y = 0) {
 
 /* ---------- Schéma de topologie ---------- */
 
-// Ordre vertical : Internet en haut, postes clients en bas.
+// Ordre vertical : Internet en haut, postes clients en bas. Le panneau de brassage a sa propre
+// rangée au-dessus des switchs, pour que ses câbles ne se mélangent pas aux autres.
 const RANG = {
   cloud_internet: 0, box_modem: 1, pare_feu: 2, routeur: 3, switch_l3: 4,
-  switch: 5, panneau_brassage: 5, point_acces: 6, serveur: 6,
+  switch: 5, panneau_brassage: 4.5, point_acces: 6, serveur: 6,
   pc: 7, imprimante: 7, telephone_ip: 7, inconnu: 7,
 };
 
@@ -162,16 +163,30 @@ export function dessinerTopologie(source, { simple = false } = {}) {
   }
   if (noeuds.length === 0) return "";
 
-  const voisins = new Map(noeuds.map((n) => [n.id, []]));
+  // Les câbles entre les deux mêmes équipements forment un seul trait (« 4 câbles »).
+  const groupes = new Map();
   for (const l of resultat.liens) {
     if (l.de === l.vers) continue;
-    voisins.get(l.de).push(l.vers);
-    voisins.get(l.vers).push(l.de);
+    const cle = [l.de, l.vers].sort().join("|");
+    (groupes.get(cle) ?? groupes.set(cle, []).get(cle)).push(l);
   }
 
-  // Couches : on garde seulement les rangs utilisés.
-  const rangs = [...new Set(noeuds.map((n) => RANG[n.type] ?? 7))].sort((a, b) => a - b);
-  const couches = rangs.map((r) => noeuds.filter((n) => (RANG[n.type] ?? 7) === r));
+  const voisins = new Map(noeuds.map((n) => [n.id, []]));
+  for (const [premier] of groupes.values()) {
+    voisins.get(premier.de).push(premier.vers);
+    voisins.get(premier.vers).push(premier.de);
+  }
+
+  // Couches : on garde seulement les rangs utilisés. Un équipement inconnu (souvent un câble qui
+  // sort de la photo) se place juste sous l'équipement auquel il est relié, pas tout en bas.
+  const rangDe = (n) => {
+    if (n.type === "inconnu" && voisins.get(n.id).length) {
+      return Math.min(...voisins.get(n.id).map((id) => RANG[parId.get(id).type] ?? 7)) + 0.25;
+    }
+    return RANG[n.type] ?? 7;
+  };
+  const rangs = [...new Set(noeuds.map(rangDe))].sort((a, b) => a - b);
+  const couches = rangs.map((r) => noeuds.filter((n) => rangDe(n) === r));
   const coucheDe = new Map();
   couches.forEach((c, i) => c.forEach((n) => coucheDe.set(n.id, i)));
 
@@ -194,16 +209,25 @@ export function dessinerTopologie(source, { simple = false } = {}) {
   trier(indices.slice(0, -1).reverse());
   trier(indices.slice(1));
 
-  const COL = 175;
-  const LIGNE = 150;
-  const MARGE_HAUT = 52;
-  const largeur = Math.max(...couches.map((c) => c.length)) * COL + 40;
-  const hauteur = couches.length * LIGNE + 10;
+  // Chaque équipement : icône au centre, nom et modèle centrés en dessous.
+  const COL = 170;
+  const LIGNE = 140;
+  const MARGE = 40;
+  const largeur = Math.max(...couches.map((c) => c.length)) * COL;
+  const hauteur = (couches.length - 1) * LIGNE + MARGE + 78;
   const xy = new Map();
   couches.forEach((c, i) => {
     const debut = (largeur - c.length * COL) / 2;
-    c.forEach((n, j) => xy.set(n.id, { x: debut + COL * (j + 0.5) - 30, y: MARGE_HAUT + i * LIGNE }));
+    c.forEach((n, j) => xy.set(n.id, { x: debut + COL * (j + 0.5), y: MARGE + i * LIGNE }));
   });
+
+  // Zones déjà occupées (icônes, noms, étiquettes de ports) pour éviter les chevauchements.
+  const occupe = [];
+  for (const { x, y } of xy.values()) {
+    occupe.push({ x: x - 27, y: y - 27, w: 54, h: 54 }, { x: x - 66, y: y + 26, w: 132, h: 32 });
+  }
+  const chevauche = (r) =>
+    occupe.some((o) => r.x < o.x + o.w && r.x + r.w > o.x && r.y < o.y + o.h && r.y + r.h > o.y);
 
   // Gravité max des problèmes par équipement, pour la pastille d'alerte.
   const alerte = new Map();
@@ -215,73 +239,193 @@ export function dessinerTopologie(source, { simple = false } = {}) {
     }
   }
 
-  const doublons = new Map();
   let traits = "";
   let etiquettes = "";
-  for (const l of resultat.liens) {
-    if (l.de === l.vers) continue;
+  for (const liens of groupes.values()) {
+    const l = liens[0];
     const a = xy.get(l.de);
     const b = xy.get(l.vers);
-    const cle = [l.de, l.vers].sort().join("|");
-    const rang = doublons.get(cle) ?? 0;
-    doublons.set(cle, rang + 1);
 
-    const dx = b.x - a.x;
-    const dy = b.y - a.y;
-    const long = Math.hypot(dx, dy) || 1;
-    const ux = dx / long;
-    const uy = dy / long;
-    // Plusieurs câbles entre les mêmes équipements : on les écarte.
-    const decal = rang === 0 ? 0 : (rang % 2 ? 1 : -1) * Math.ceil(rang / 2) * 14;
-    const ox = -uy * decal;
-    const oy = ux * decal;
-    const x1 = a.x + ux * 30 + ox, y1 = a.y + uy * 30 + oy;
-    const x2 = b.x - ux * 30 + ox, y2 = b.y - uy * 30 + oy;
+    // Si un autre équipement est sur le chemin, le câble le contourne en courbe.
+    let ctrl = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+    const obstacle = [...xy.entries()].find(
+      ([id, p]) => id !== l.de && id !== l.vers && distanceSegment(p, a, b) < 40
+    );
+    if (obstacle) {
+      const p = obstacle[1];
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      const long = Math.hypot(dx, dy) || 1;
+      const nx = -dy / long;
+      const ny = dx / long;
+      const cote = (p.x - ctrl.x) * nx + (p.y - ctrl.y) * ny > 0 ? -1 : 1;
+      ctrl = { x: ctrl.x + nx * 90 * cote, y: ctrl.y + ny * 90 * cote };
+    }
+    // Les extrémités partent du bord de l'icône, dans la direction du trait.
+    const bord = (depuis, vers) => {
+      const d = Math.hypot(vers.x - depuis.x, vers.y - depuis.y) || 1;
+      return { x: depuis.x + ((vers.x - depuis.x) / d) * 28, y: depuis.y + ((vers.y - depuis.y) / d) * 28 };
+    };
+    const p0 = bord(a, ctrl);
+    const p2 = bord(b, ctrl);
+    const point = (t) => ({
+      x: (1 - t) ** 2 * p0.x + 2 * (1 - t) * t * ctrl.x + t ** 2 * p2.x,
+      y: (1 - t) ** 2 * p0.y + 2 * (1 - t) * t * ctrl.y + t ** 2 * p2.y,
+    });
 
+    // Style : le trait le plus « sûr » du groupe l'emporte.
+    const certitude = liens.some((x) => x.certitude === "observe")
+      ? "observe"
+      : liens.every((x) => x.certitude === "propose")
+        ? "propose"
+        : "deduit";
     const style = STYLE_CABLE[l.cable] ?? { couleur: "var(--lien)", tirets: "" };
     let couleur = style.couleur;
     let tirets = style.tirets;
-    if (l.certitude === "deduit" && !tirets) tirets = "7 5";
-    if (l.certitude === "propose") {
+    if (certitude === "deduit" && !tirets) tirets = "7 5";
+    if (certitude === "propose") {
       couleur = "var(--propose)";
       tirets = "7 5";
     }
-    const titre = `${l.de} ${l.port_de || "?"} ↔ ${l.vers} ${l.port_vers || "?"} — câble ${l.cable}, ${l.certitude}${l.remarque ? " — " + l.remarque : ""}`;
-    traits += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" style="stroke:${couleur}" stroke-width="2.4" stroke-dasharray="${tirets}" stroke-linecap="round"><title>${echapper(titre)}</title></line>`;
+    const titre = liens
+      .map((x) => `${x.de} ${x.port_de || "?"} ↔ ${x.vers} ${x.port_vers || "?"} (${NOMS_CABLE[x.cable] ?? x.cable}, ${NOMS_CERTITUDE[x.certitude] ?? x.certitude})`)
+      .join("\n");
+    traits += `<path class="lien" d="M${p0.x} ${p0.y} Q${ctrl.x} ${ctrl.y} ${p2.x} ${p2.y}" fill="none"
+      style="stroke:${couleur}" stroke-width="${liens.length > 1 ? 3.4 : 2.4}" stroke-dasharray="${tirets}" stroke-linecap="round"><title>${echapper(titre)}</title></path>`;
 
-    const distance = Math.min(30, Math.max(14, long * 0.18 - 10));
-    for (const [port, px, py] of [
-      [l.port_de, x1 + ux * distance, y1 + uy * distance],
-      [l.port_vers, x2 - ux * distance, y2 - uy * distance],
-    ]) {
-      if (!port) continue;
-      const texte = tronquer(port, 12);
-      const w = texte.length * 6.2 + 10;
-      etiquettes += `<g><rect class="port-fond" x="${px - w / 2}" y="${py - 9}" width="${w}" height="18" rx="9" style="stroke:${couleur}"/>
-        <text class="port-etiquette" x="${px}" y="${py + 3.5}" text-anchor="middle">${echapper(texte)}</text></g>`;
+    // Étiquettes : le nom du port près de chaque bout, ou « 4 câbles » au milieu.
+    const placer = (texte, essais) => {
+      const w = texte.length * 6.2 + 12;
+      for (const t of essais) {
+        const c = point(t);
+        const r = { x: c.x - w / 2, y: c.y - 9, w, h: 18 };
+        if (!chevauche(r)) {
+          occupe.push(r);
+          etiquettes += `<g><rect class="port-fond" x="${r.x}" y="${r.y}" width="${w}" height="18" rx="9" style="stroke:${couleur}"/>
+            <text class="port-etiquette" x="${c.x}" y="${c.y + 3.5}" text-anchor="middle">${echapper(texte)}</text></g>`;
+          return;
+        }
+      }
+    };
+    if (liens.length > 1) {
+      placer(`${liens.length} câbles`, [0.5, 0.4, 0.6, 0.3, 0.7]);
+    } else {
+      if (l.port_de) placer(tronquer(l.port_de, 10), [0.2, 0.28, 0.12, 0.36, 0.44]);
+      if (l.port_vers) placer(tronquer(l.port_vers, 10), [0.8, 0.72, 0.88, 0.64, 0.56]);
     }
   }
 
   let blocs = "";
   for (const n of noeuds) {
     const { x, y } = xy.get(n.id);
-    const sous = tronquer(n.modele || n.nom || NOMS_TYPE[n.type] || "", 20);
+    const sous = tronquer(n.modele || n.nom || NOMS_TYPE[n.type] || "", 22);
     const gravite = alerte.get(n.id);
     const pastille = gravite
-      ? `<circle cx="${x + 21}" cy="${y - 21}" r="9" style="fill:${gravite === "bloquant" ? "var(--ko)" : "var(--warn)"};stroke:var(--carte)" stroke-width="2"/>
-         <text x="${x + 21}" y="${y - 17}" text-anchor="middle" style="fill:#fff;font-size:12px;font-weight:800">!</text>`
+      ? `<circle cx="${x + 20}" cy="${y - 20}" r="9" style="fill:${gravite === "bloquant" ? "var(--ko)" : "var(--warn)"};stroke:var(--carte)" stroke-width="2"/>
+         <text x="${x + 20}" y="${y - 16}" text-anchor="middle" style="fill:#fff;font-size:12px;font-weight:800">!</text>`
       : "";
     blocs += `<g class="noeud" data-id="${echapper(n.id)}" tabindex="0" role="button" aria-label="${echapper(n.id + " " + (n.nom || ""))}">
-      ${icone(n.type, 48, x - 24, y - 24)}
+      ${icone(n.type, 44, x - 22, y - 22)}
       ${pastille}
-      <text class="noeud-nom" x="${x + 32}" y="${y - 2}">${echapper(tronquer(n.etiquette ?? n.id, 14))}</text>
-      <text class="noeud-sous" x="${x + 32}" y="${y + 12}">${echapper(sous)}</text>
+      <text class="noeud-nom" x="${x}" y="${y + 38}" text-anchor="middle">${echapper(tronquer(n.etiquette ?? n.id, 16))}</text>
+      <text class="noeud-sous" x="${x}" y="${y + 52}" text-anchor="middle">${echapper(sous)}</text>
     </g>`;
   }
 
-  return `<svg class="topologie" viewBox="0 0 ${largeur} ${hauteur}" style="max-width:${largeur}px" role="img" aria-label="Schéma réseau">
+  return `<svg class="topologie" viewBox="0 0 ${largeur} ${hauteur}" style="max-width:${Math.round(largeur * 1.3)}px" role="img" aria-label="Schéma réseau">
     ${traits}${etiquettes}${blocs}
   </svg>`;
+}
+
+// Distance d'un point au segment [a, b].
+function distanceSegment(p, a, b) {
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const t = Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.y - a.y) * dy) / (dx * dx + dy * dy || 1)));
+  return Math.hypot(p.x - (a.x + t * dx), p.y - (a.y + t * dy));
+}
+
+/* ---------- Aide à la lecture pour les débutants ---------- */
+
+const ROLES = {
+  routeur: "relie des réseaux différents entre eux (et vers Internet).",
+  switch: "relie les appareils d'un même réseau.",
+  switch_l3: "switch qui sait aussi faire passer le trafic d'un VLAN à l'autre.",
+  pare_feu: "filtre ce qui entre et sort du réseau.",
+  point_acces: "connecte les appareils en Wi-Fi.",
+  box_modem: "donne l'accès à Internet.",
+  serveur: "rend des services aux autres machines (fichiers, web, DHCP…).",
+  pc: "poste de travail d'un utilisateur.",
+  imprimante: "imprimante partagée sur le réseau.",
+  telephone_ip: "téléphone qui passe par le réseau informatique.",
+  cloud_internet: "le réseau extérieur (Internet).",
+  panneau_brassage: "simple répartiteur, sans électronique : il relie les prises des salles aux équipements de la baie.",
+  inconnu: "équipement non identifié (par exemple un câble qui sort de la photo).",
+};
+
+export const NOMS_CABLE = {
+  droit: "câble droit",
+  croise: "câble croisé",
+  fibre: "fibre optique",
+  console: "câble console",
+  serie: "câble série",
+  wifi: "Wi-Fi",
+  inconnu: "câble",
+};
+
+export const NOMS_CERTITUDE = {
+  observe: "vu sur la photo",
+  deduit: "déduit, pas vu en entier",
+  propose: "à ajouter pour que ça marche",
+};
+
+// « Comment lire ce schéma » : seulement les éléments présents sur ce schéma.
+export function rendreGuideSchema(r) {
+  const types = [...new Set(r.equipements.map((e) => e.type))];
+  const certitudes = new Set(r.liens.map((l) => l.certitude));
+  const cables = new Set(r.liens.map((l) => l.cable));
+  const traits = [
+    certitudes.has("observe") && `<span><i></i>trait plein : câble vu sur la photo</span>`,
+    certitudes.has("deduit") && `<span><i class="deduit"></i>pointillés : câble déduit, pas vu en entier</span>`,
+    certitudes.has("propose") && `<span><i class="propose"></i>orange : câble à ajouter pour que ça marche</span>`,
+    cables.has("console") && `<span><i class="console"></i>bleu clair : câble console (pour configurer)</span>`,
+  ].filter(Boolean);
+  return `<details class="guide-schema" open>
+    <summary>Comment lire ce schéma</summary>
+    <ul class="guide-types">${types
+      .map(
+        (t) => `<li><svg width="26" height="26" viewBox="0 0 48 48" aria-hidden="true">${icone(t, 48)}</svg>
+          <span><b>${echapper(NOMS_TYPE[t] ?? t)}</b> : ${echapper(ROLES[t] ?? "")}</span></li>`
+      )
+      .join("")}</ul>
+    <div class="legende">${traits.join("")}</div>
+    <p class="muted petit">Les petites étiquettes sur les câbles donnent le nom du port à chaque bout (ex : Fa0/1 = port FastEthernet 0/1). Un « ! » signale un équipement concerné par un problème.</p>
+  </details>`;
+}
+
+// Les connexions écrites en toutes lettres, une par ligne.
+export function rendreConnexions(r) {
+  if (!r.liens.length) return "";
+  const nom = (id) => r.equipements.find((e) => e.id === id);
+  const bout = (id, port) =>
+    `<b>${echapper(id)}</b>${nom(id)?.modele ? ` <span class="muted">(${echapper(nom(id).modele)})</span>` : ""}${
+      port ? ` port <code>${echapper(port)}</code>` : ""
+    }`;
+  const ordre = { observe: 0, deduit: 1, propose: 2 };
+  return `<div class="carte">
+    <h3>Les connexions, une par une</h3>
+    <ul class="connexions">${[...r.liens]
+      .sort((a, b) => (ordre[a.certitude] ?? 1) - (ordre[b.certitude] ?? 1))
+      .map(
+        (l) => `<li class="${echapper(l.certitude)}">
+          <div>${bout(l.de, l.port_de)} <span aria-hidden="true">⟷</span> ${bout(l.vers, l.port_vers)}</div>
+          <div class="muted petit">${echapper(NOMS_CABLE[l.cable] ?? l.cable)} · ${echapper(NOMS_CERTITUDE[l.certitude] ?? l.certitude)}${
+            l.remarque ? ` · ${echapper(l.remarque)}` : ""
+          }</div>
+        </li>`
+      )
+      .join("")}</ul>
+  </div>`;
 }
 
 /* ---------- Façade de l'équipement ---------- */

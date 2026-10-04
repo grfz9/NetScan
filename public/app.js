@@ -1,4 +1,14 @@
-import { echapper, icone, NOMS_TYPE, dessinerTopologie, dessinerFacade, colorerCommandes, schemaComplexe } from "./rendu.js";
+import {
+  echapper,
+  icone,
+  NOMS_TYPE,
+  dessinerTopologie,
+  dessinerFacade,
+  colorerCommandes,
+  schemaComplexe,
+  rendreGuideSchema,
+  rendreConnexions,
+} from "./rendu.js";
 import {
   MAX_PHOTOS,
   MODELE_PAR_DEFAUT,
@@ -491,13 +501,9 @@ function rendreSchema(r) {
       </div>
       <div class="defile">${dessinerTopologie(r, { simple })}</div>
       ${simple ? `<p class="note-schema">Vue simplifiée : les postes identiques sont regroupés et les noms de ports sont masqués.</p>` : ""}
-      <div class="legende">
-        <span><i></i>câble observé</span>
-        <span><i class="deduit"></i>déduit</span>
-        <span><i class="propose"></i>à ajouter</span>
-        <span><i class="console"></i>console</span>
-      </div>
-    </div>`;
+      ${rendreGuideSchema(r)}
+    </div>
+    ${rendreConnexions(r)}`;
   }
 
   r.equipements.forEach((e, i) => {
