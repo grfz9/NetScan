@@ -209,7 +209,7 @@ async function lancerAnalyse() {
   const mode = modeAnalyse();
   if (!mode) {
     afficherReglages();
-    toast("Ajoute d'abord ta clé API pour analyser tes photos.", true);
+    toast("Pour analyser sans clé, ouvre NetScan sur claude.ai.", true);
     return;
   }
   const contexte = $("#contexte").value.trim();
@@ -366,7 +366,7 @@ function rendreQualite(q) {
 function afficherResultat(r, { demo = false } = {}) {
   etat.resultat = r;
   $("#bandeau-demo").hidden = !demo;
-  $("#btn-demo-reglages").textContent = modeAnalyse() || SUR_CLAUDE_AI ? "Analyser ma photo" : "Ajouter ma clé API";
+  $("#btn-demo-reglages").textContent = modeAnalyse() || SUR_CLAUDE_AI ? "Analyser ma photo" : "Analyser mes photos";
   rendreQualite(r.qualite_image);
   const d = r.diagnostic ?? { statut: "indeterminable", resume: "", problemes: [], verifications: [] };
   const statut = r.type_image === "hors_sujet" ? "indeterminable" : d.statut;
@@ -714,6 +714,9 @@ function afficherReglages() {
   const surClaude = SUR_CLAUDE_AI;
   $("#etat-compte").textContent = etat.compteClaude ? `Connecté · ${maxPhotos()} photos max par analyse.` : etat.messageCompteClaude;
   $("#carte-compte").hidden = !surClaude;
+  // Sans serveur ni compte Claude (GitHub Pages) : on propose d'abord la version claude.ai, gratuite.
+  $("#carte-claude-ai").hidden = surClaude || modeAnalyse() === "serveur";
+  $("#carte-cle h3").textContent = $("#carte-claude-ai").hidden ? "Clé API Anthropic" : "Ou avec une clé API Anthropic";
   $("#carte-cle").hidden = surClaude;
   $("#carte-modele").hidden = surClaude;
   $("#cle-api").value = "";
@@ -744,7 +747,7 @@ function majStatut() {
   } else if (mode === "navigateur") {
     el.textContent = `Clé API enregistrée sur cet appareil · ${$("#choix-modele").selectedOptions[0].text.split(" —")[0]}`;
   } else {
-    el.innerHTML = `Pour analyser tes photos, <button type="button" class="lien-texte" id="lien-reglages">ajoute ta clé API</button>. L'exemple fonctionne sans.`;
+    el.innerHTML = `Pour analyser tes photos sans clé, <a class="lien-texte" href="https://claude.ai/artifact/H1swDNTebB1nnT7PFtLmUS" target="_blank" rel="noopener">ouvre NetScan sur claude.ai</a>, ou <button type="button" class="lien-texte" id="lien-reglages">ajoute une clé API</button>. L'exemple fonctionne sans.`;
   }
 }
 

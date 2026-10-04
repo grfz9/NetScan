@@ -225,6 +225,9 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .actions-ligne > * { flex: 1; margin-top: 0; }
 .aide a, .lien-texte { color: var(--accent); font-weight: 600; background: none; border: 0; padding: 0; text-decoration: underline; text-underline-offset: 3px; }
 .vue > h2 { margin: 8px 0 14px; }
+.carte-sans-cle { border: 2px solid var(--accent); }
+.carte-sans-cle .btn-principal { text-decoration: none; box-sizing: border-box; margin: 4px 0 8px; }
+.petit { font-size: 0.82rem; }
 
 /* Chargement */
 .scan {
