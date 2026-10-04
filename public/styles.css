@@ -458,6 +458,20 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .topologie .noeud-sous { font-size: 10.5px; fill: var(--texte-2); }
 .topologie .port-etiquette { font-size: 10px; font-weight: 600; }
 .topologie .port-fond { fill: var(--carte); stroke: var(--bord); }
+/* Halo autour des noms pour qu'ils restent lisibles même sur un câble. */
+.topologie .noeud-nom, .topologie .noeud-sous { paint-order: stroke; stroke: var(--carte); stroke-width: 4px; stroke-linejoin: round; }
+.topologie .noeud:hover .noeud-nom, .topologie .noeud:focus .noeud-nom { fill: var(--accent); }
+
+/* Aide à la lecture */
+.guide-schema { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--bord); }
+.guide-types { list-style: none; padding: 0; margin: 10px 0; display: grid; gap: 8px; }
+.guide-types li { display: flex; gap: 10px; align-items: flex-start; font-size: 0.9rem; }
+.guide-types svg { flex: none; margin-top: 1px; }
+.connexions { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.connexions li { padding: 8px 10px 8px 12px; border-radius: 10px; background: var(--carte-2); border-left: 3px solid var(--lien); overflow-wrap: anywhere; }
+.connexions li.deduit { border-left-style: dashed; }
+.connexions li.propose { border-left-color: var(--propose); }
+.connexions code { font: 600 0.85em ui-monospace, Consolas, monospace; padding: 1px 5px; border-radius: 5px; background: var(--carte); }
 .topologie .icone { color: var(--texte); }
 .topologie .noeud { cursor: pointer; }
 .entete-schema { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
