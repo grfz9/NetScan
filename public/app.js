@@ -818,9 +818,11 @@ if ("serviceWorker" in navigator && window.isSecureContext && !window.claude) {
     .then((reg) => reg.update())
     .catch(() => {});
   // Quand une nouvelle version prend le relais, on recharge une fois pour l'afficher.
+  // (Pas à la toute première visite : il n'y avait pas encore d'ancienne version.)
+  const ancienneVersion = Boolean(navigator.serviceWorker.controller);
   let rechargee = false;
   navigator.serviceWorker.addEventListener("controllerchange", () => {
-    if (rechargee || !navigator.serviceWorker.controller) return;
+    if (rechargee || !ancienneVersion) return;
     rechargee = true;
     location.reload();
   });
