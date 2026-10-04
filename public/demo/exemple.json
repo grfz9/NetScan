@@ -181,5 +181,8 @@
     { "titre": "Je vérifie ce qu'il faut côté switch", "detail": "Pour que le routeur reçoive les deux VLAN, le port Gi0/1 du switch doit être en trunk, et chaque PC doit être dans le bon VLAN. Rien ne le montre sur la photo : je l'ajoute à la configuration." },
     { "titre": "Je conclus", "detail": "En l'état, PC1 ne peut pas pinger PC2. Avec les trois corrections bloquantes et la passerelle de PC2, le ping doit passer." }
   ],
+  "materiel_a_prevoir": [
+    { "element": "Câble console RJ45 vers USB", "quantite": "1", "raison": "Pour configurer SW1 en même temps que R1. Sinon, déplace le câble console d'un équipement à l'autre." }
+  ],
   "limites": "La configuration complète du switch n'est pas visible : le trunk et les VLAN ont été déduits de la consigne. Une photo de « show running-config » sur SW1 permettrait de le confirmer."
 }

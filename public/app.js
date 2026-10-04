@@ -4,6 +4,7 @@ import {
   MODELE_PAR_DEFAUT,
   analyserAvec,
   messageErreur,
+  nettoyerMateriel,
   analyserAvecCompteClaude,
   messageErreurCompteClaude,
 } from "./coeur.js";
@@ -12,6 +13,20 @@ const $ = (sel) => document.querySelector(sel);
 const CLE_HISTORIQUE = "netscan.historique";
 const CLE_API = "netscan.cleApi";
 const CLE_MODELE = "netscan.modele";
+const CLE_MATERIEL = "netscan.materiel";
+const RACCOURCIS_MATERIEL = [
+  "Routeur Cisco 1841",
+  "Routeur Cisco 2911",
+  "Switch Cisco Catalyst 2960",
+  "Switch Cisco SF300-24",
+  "PC",
+  "Câble droit RJ45",
+  "Câble croisé RJ45",
+  "Câble console",
+  "Câble série DCE/DTE",
+  "Panneau de brassage",
+  "Point d'accès Wi-Fi",
+];
 // SDK officiel d'Anthropic, chargé seulement si l'analyse se fait depuis le navigateur.
 const URL_SDK = "https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@0.131.0/+esm";
 
@@ -213,6 +228,7 @@ async function lancerAnalyse() {
     return;
   }
   const contexte = $("#contexte").value.trim();
+  const materiel = $("#utiliser-materiel").checked ? lireMateriel() : [];
   const images = etat.photos.map(({ data, media_type }) => ({ data, media_type }));
   $("#scan-image").src = etat.photos[0].apercu;
   marquerEtape("envoi");
@@ -220,7 +236,7 @@ async function lancerAnalyse() {
 
   try {
     const analyser = { serveur: analyserViaServeur, claude: analyserViaCompteClaude, navigateur: analyserDansNavigateur }[mode];
-    const resultat = await analyser({ images, contexte, onEtape: marquerEtape });
+    const resultat = await analyser({ images, contexte, materiel, onEtape: marquerEtape });
     const vignette = await miniatureDepuis(etat.photos[0].apercu).catch(() => "");
     enregistrerHistorique({ resultat, contexte, vignette });
     afficherResultat(resultat);
@@ -233,24 +249,24 @@ async function lancerAnalyse() {
 const maxPhotos = () => etat.compteClaude?.maxPhotos ?? MAX_PHOTOS;
 
 // Mode claude.ai : les photos partent avec le compte Claude de la personne (aucune clé).
-async function analyserViaCompteClaude({ images, contexte, onEtape }) {
+async function analyserViaCompteClaude({ images, contexte, materiel, onEtape }) {
   const fichiers = images.map(({ data, media_type }) => {
     const octets = Uint8Array.from(atob(data), (c) => c.charCodeAt(0));
     return new Blob([octets], { type: media_type });
   });
   try {
-    return await analyserAvecCompteClaude(etat.compteClaude.sample, { images: fichiers, contexte, onEtape });
+    return await analyserAvecCompteClaude(etat.compteClaude.sample, { images: fichiers, contexte, materiel, onEtape });
   } catch (err) {
     throw new Error(messageErreurCompteClaude(err));
   }
 }
 
 // Mode serveur : le serveur Node appelle Claude et renvoie la progression en NDJSON.
-async function analyserViaServeur({ images, contexte, onEtape }) {
+async function analyserViaServeur({ images, contexte, materiel, onEtape }) {
   const reponse = await fetch("api/analyse", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ images, contexte }),
+    body: JSON.stringify({ images, contexte, materiel }),
   });
   if (!reponse.ok) {
     const corps = await reponse.json().catch(() => ({}));
@@ -281,7 +297,7 @@ async function analyserViaServeur({ images, contexte, onEtape }) {
 
 // Mode navigateur (GitHub Pages) : l'appli appelle Claude directement avec la clé enregistrée ici.
 let Anthropic;
-async function analyserDansNavigateur({ images, contexte, onEtape }) {
+async function analyserDansNavigateur({ images, contexte, materiel, onEtape }) {
   try {
     Anthropic ??= (await import(URL_SDK)).default;
   } catch {
@@ -289,7 +305,7 @@ async function analyserDansNavigateur({ images, contexte, onEtape }) {
   }
   const client = new Anthropic({ apiKey: lire(CLE_API), dangerouslyAllowBrowser: true });
   try {
-    const { resultat } = await analyserAvec(client, { images, contexte, onEtape, modele: modeleChoisi() });
+    const { resultat } = await analyserAvec(client, { images, contexte, materiel, onEtape, modele: modeleChoisi() });
     return resultat;
   } catch (err) {
     throw new Error(messageErreur(err, Anthropic));
@@ -391,7 +407,7 @@ function afficherResultat(r, { demo = false } = {}) {
   etat.schemaSimple = false;
   $("#onglet-schema").innerHTML = rendreSchema(r);
   $("#onglet-config").innerHTML = rendreConfig(r);
-  $("#onglet-diagnostic").innerHTML = rendreDiagnostic(d);
+  $("#onglet-diagnostic").innerHTML = rendreMaterielAPrevoir(r.materiel_a_prevoir) + rendreDiagnostic(d);
   $("#onglet-etapes").innerHTML = rendreEtapes(r);
   etapesVisibles = 1;
   majEtapes();
@@ -403,6 +419,7 @@ function rendreSchema(r) {
   let html = `<div class="carte">
     <h3>${echapper(r.titre)} <span class="chip">${echapper(libelleTypeImage(r.type_image))}</span></h3>
     <p class="muted">${echapper(r.resume)}</p>
+    ${equipementsReels(r).length ? `<button class="btn-mini" type="button" id="btn-ajouter-vus">Ajouter ces équipements à mon matériel</button>` : ""}
   </div>`;
 
   if (r.equipements.length) {
@@ -500,6 +517,17 @@ function rendreConfig(r) {
     </div>`;
   }
   return html;
+}
+
+function rendreMaterielAPrevoir(liste = []) {
+  if (!liste.length) return "";
+  return `<h2>Matériel à prévoir</h2>
+    <div class="carte"><ul class="a-prevoir">${liste
+      .map(
+        (m) => `<li><strong>${echapper(m.quantite || "1")} × ${echapper(m.element)}</strong><br>
+          <span class="muted">${echapper(m.raison)}</span></li>`
+      )
+      .join("")}</ul></div>`;
 }
 
 function rendreDiagnostic(d) {
@@ -682,6 +710,11 @@ $("#vue-resultat").addEventListener("click", async (e) => {
     return;
   }
   if (e.target.id === "btn-reprendre") return afficherVue("accueil");
+  if (e.target.id === "btn-ajouter-vus") {
+    const n = equipementsReels(etat.resultat).length;
+    for (const e of equipementsReels(etat.resultat)) ajouterMateriel(nomMateriel(e), 1);
+    return toast(`${n} équipement${n > 1 ? "s" : ""} ajouté${n > 1 ? "s" : ""} à ton matériel.`);
+  }
   if (e.target.id === "btn-demo-reglages") return modeAnalyse() || SUR_CLAUDE_AI ? afficherVue("accueil") : afficherReglages();
   if (e.target.id === "btn-simplifier") {
     etat.schemaSimple = !etat.schemaSimple;
@@ -707,6 +740,78 @@ $("#vue-resultat").addEventListener("keydown", (e) => {
     e.target.closest(".port, .noeud").dispatchEvent(new MouseEvent("click", { bubbles: true }));
   }
 });
+
+/* ---------- Mon matériel (gardé sur l'appareil) ---------- */
+
+function lireMateriel() {
+  try {
+    return nettoyerMateriel(JSON.parse(lire(CLE_MATERIEL) || "[]"));
+  } catch {
+    return [];
+  }
+}
+
+function ecrireMateriel(liste) {
+  ecrire(CLE_MATERIEL, liste.length ? JSON.stringify(liste) : "");
+  afficherMateriel();
+}
+
+function ajouterMateriel(nom, quantite) {
+  nom = nom.trim();
+  if (!nom) return;
+  const liste = lireMateriel();
+  const existant = liste.find((m) => m.nom.toLowerCase() === nom.toLowerCase());
+  if (existant) existant.quantite = Math.min(99, existant.quantite + quantite);
+  else liste.push({ nom, quantite });
+  ecrireMateriel(liste);
+}
+
+function afficherMateriel() {
+  const liste = lireMateriel();
+  $("#compte-materiel").textContent = liste.length
+    ? `${liste.reduce((s, m) => s + m.quantite, 0)} élément${liste.length > 1 ? "s" : ""}`
+    : "vide";
+  $("#liste-materiel").innerHTML = liste
+    .map(
+      (m, i) => `<li><span class="qte">${m.quantite} ×</span><span class="nom">${echapper(m.nom)}</span>
+        <button type="button" data-moins="${i}" aria-label="Retirer un ${echapper(m.nom)}">−</button>
+        <button type="button" data-plus="${i}" aria-label="Ajouter un ${echapper(m.nom)}">+</button></li>`
+    )
+    .join("");
+  const deja = new Set(liste.map((m) => m.nom.toLowerCase()));
+  $("#raccourcis-materiel").innerHTML = RACCOURCIS_MATERIEL.filter((n) => !deja.has(n.toLowerCase()))
+    .map((n) => `<button type="button" data-raccourci="${echapper(n)}">+ ${echapper(n)}</button>`)
+    .join("");
+  $("#suggestions-materiel").innerHTML = RACCOURCIS_MATERIEL.map((n) => `<option value="${echapper(n)}"></option>`).join("");
+}
+
+// Équipements identifiés sur la photo qui peuvent rejoindre la liste (pas Internet ni « inconnu »).
+const equipementsReels = (r) =>
+  (r?.equipements ?? []).filter((e) => !["cloud_internet", "inconnu"].includes(e.type));
+const nomMateriel = (e) => [e.marque, e.modele].filter(Boolean).join(" ") || NOMS_TYPE[e.type] || e.nom;
+
+$("#btn-ajouter-materiel").addEventListener("click", () => {
+  ajouterMateriel($("#nom-materiel").value, Math.max(1, Number($("#quantite-materiel").value) || 1));
+  $("#nom-materiel").value = "";
+  $("#quantite-materiel").value = "1";
+  $("#nom-materiel").focus();
+});
+$("#nom-materiel").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") $("#btn-ajouter-materiel").click();
+});
+$("#bloc-materiel").addEventListener("click", (e) => {
+  const liste = lireMateriel();
+  const { plus, moins, raccourci } = e.target.dataset;
+  if (raccourci) return ajouterMateriel(raccourci, 1);
+  if (plus !== undefined) liste[plus].quantite = Math.min(99, liste[plus].quantite + 1);
+  else if (moins !== undefined) {
+    liste[moins].quantite--;
+    if (liste[moins].quantite < 1) liste.splice(Number(moins), 1);
+  } else return;
+  ecrireMateriel(liste);
+});
+
+afficherMateriel();
 
 /* ---------- Réglages ---------- */
 

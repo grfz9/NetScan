@@ -124,5 +124,13 @@ export const SCHEMA_ANALYSE = obj({
     }),
     "Raisonnement étape par étape, comme Photomath"
   ),
+  materiel_a_prevoir: arr(
+    obj({
+      element: str("Équipement, câble ou module à se procurer (ex : câble croisé, carte WIC-2T)"),
+      quantite: str("Quantité, ex : \"1\""),
+      raison: str("Pourquoi il est nécessaire, et ce qu'on peut faire à la place si possible"),
+    }),
+    "Ce qui manque dans le matériel disponible de l'étudiant pour réaliser le schéma et la config. Vide si rien ne manque ou si aucun matériel n'est indiqué"
+  ),
   limites: str("Ce qui n'a pas pu être déterminé et ce qu'il faudrait photographier en plus. Chaîne vide si rien"),
 });
