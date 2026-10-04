@@ -26,6 +26,7 @@ const CLE_API = "netscan.cleApi";
 const CLE_MODELE = "netscan.modele";
 const CLE_MATERIEL = "netscan.materiel";
 const CLE_CODE = "netscan.codeAcces";
+const CLE_CREDIT = "netscan.credit"; // code NetScan NS-… d'un pack acheté
 const RACCOURCIS_MATERIEL = [
   "Routeur Cisco 1841",
   "Routeur Cisco 2911",
@@ -48,6 +49,7 @@ const etat = {
   schemaSimple: false,
   vueSchema: "actuel", // "actuel" (ce qui est branché) ou "conseille" (schéma proposé par NetScan)
   serveur: { cle: false, modele: "" }, // ce que dit /api/statut (absent sur GitHub Pages)
+  compte: null, // ce que dit le relais : { pack, essais_restants, paiement_actif, credit? }
   compteClaude: null, // { sample, maxPhotos } quand la page tourne sur claude.ai
   messageCompteClaude: "Connexion à ton compte Claude…",
 };
@@ -84,7 +86,8 @@ function modeAnalyse() {
   if (etat.serveur.cle) return "serveur";
   if (etat.compteClaude) return "claude";
   if (lire(CLE_API)) return "navigateur";
-  if (URL_RELAIS && lire(CLE_CODE)) return "relais";
+  // Le relais sert aussi sans code : essais gratuits, puis packs d'analyses achetés.
+  if (URL_RELAIS && !SUR_CLAUDE_AI) return "relais";
   return null;
 }
 
@@ -103,7 +106,7 @@ function toast(message, erreur = false) {
   el.classList.toggle("erreur", erreur);
   el.hidden = false;
   clearTimeout(toast.minuteur);
-  toast.minuteur = setTimeout(() => (el.hidden = true), erreur ? 6000 : 2500);
+  toast.minuteur = setTimeout(() => (el.hidden = true), Math.max(erreur ? 6000 : 2500, message.length * 50));
 }
 
 /* ---------- Photos ---------- */
@@ -320,8 +323,16 @@ const analyserViaServeur = ({ images, contexte, materiel, onEtape }) =>
 // Mode relais : même format, mais c'est le relais Cloudflare qui détient la clé.
 async function analyserViaRelais({ images, contexte, materiel, onEtape }) {
   try {
-    return await analyserEnFlux(`${URL_RELAIS}/analyse`, { code: lire(CLE_CODE), images, contexte, materiel }, onEtape);
+    const corps = { images, contexte, materiel };
+    if (lire(CLE_CODE)) corps.code = lire(CLE_CODE);
+    else if (lire(CLE_CREDIT)) corps.credit = lire(CLE_CREDIT);
+    return await analyserEnFlux(`${URL_RELAIS}/analyse`, corps, onEtape);
   } catch (err) {
+    if (err.statut === 402) {
+      // Plus d'analyses : on ouvre directement l'achat.
+      setTimeout(afficherReglages, 0);
+      throw err;
+    }
     if (err.statut === 401) {
       ecrire(CLE_CODE, "");
       majStatut();
@@ -359,6 +370,7 @@ async function analyserEnFlux(url, corpsRequete, onEtape) {
       if (msg.etape) onEtape(msg.etape);
       if (msg.erreur) throw new Error(msg.erreur);
       if (msg.resultat) resultat = msg.resultat;
+      if (msg.compte) majCompteApresAnalyse(msg.compte);
     }
   }
   if (!resultat) throw new Error("La connexion a été coupée avant la fin de l'analyse.");
@@ -920,6 +932,136 @@ $("#bloc-materiel").addEventListener("click", (e) => {
 
 afficherMateriel();
 
+/* ---------- Compte NetScan : essais gratuits et packs d'analyses ---------- */
+
+const euros = (centimes) => (centimes / 100).toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
+
+function texteStatutRelais() {
+  const lien = (texte) => `<button type="button" class="lien-texte" id="lien-reglages">${texte}</button>`;
+  if (lire(CLE_CODE)) return "Analyse avec la clé partagée NetScan (code d'accès).";
+  const c = etat.compte;
+  if (c?.credit) {
+    return c.credit.restant > 0
+      ? `${c.credit.restant} analyse${c.credit.restant > 1 ? "s" : ""} restante${c.credit.restant > 1 ? "s" : ""} sur ton code NetScan · ${lien("Mon compte")}`
+      : `Plus d'analyses sur ton code NetScan : ${lien("recharge-le")}.`;
+  }
+  if (!c) return `Analyses NetScan · ${lien("Mon compte")}`;
+  if (c.essais_restants > 0) {
+    return `${c.essais_restants} analyse${c.essais_restants > 1 ? "s" : ""} gratuite${c.essais_restants > 1 ? "s" : ""} pour essayer · ${lien(`puis ${c.pack.analyses} analyses pour ${euros(c.pack.prix)}`)}`;
+  }
+  return `Analyses gratuites utilisées : ${lien(`achète ${c.pack.analyses} analyses pour ${euros(c.pack.prix)}`)}, ou entre un code d'accès.`;
+}
+
+async function appelRelais(chemin, corps) {
+  const reponse = await fetch(`${URL_RELAIS}${chemin}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(corps),
+  });
+  const donnees = await reponse.json().catch(() => ({}));
+  if (!reponse.ok) throw Object.assign(new Error(donnees.erreur || "Le relais NetScan ne répond pas."), { statut: reponse.status });
+  return donnees;
+}
+
+async function rafraichirCompte() {
+  if (!URL_RELAIS || SUR_CLAUDE_AI) return;
+  const credit = lire(CLE_CREDIT);
+  try {
+    etat.compte = await appelRelais("/compte", credit ? { credit } : {});
+  } catch (err) {
+    // Code inconnu (paiement pas encore enregistré, ou code faux) : on garde au moins l'essai.
+    if (err.statut === 404 && credit) etat.compte = await appelRelais("/compte", {}).catch(() => null);
+  }
+  afficherCompte();
+  majStatut();
+}
+
+function majCompteApresAnalyse(compte) {
+  if (!etat.compte) return;
+  if (compte.type === "credit" && etat.compte.credit) etat.compte.credit.restant = compte.restant;
+  if (compte.type === "essai") etat.compte.essais_restants = compte.essais_restants;
+  majStatut();
+}
+
+function afficherCompte() {
+  const c = etat.compte;
+  const credit = lire(CLE_CREDIT);
+  $("#solde-compte").innerHTML = !c
+    ? "Impossible de joindre le relais NetScan pour l'instant."
+    : c.credit
+      ? `<strong>${c.credit.restant}</strong> analyse${c.credit.restant > 1 ? "s" : ""} restante${c.credit.restant > 1 ? "s" : ""} sur ce code (${c.credit.achete} achetée${c.credit.achete > 1 ? "s" : ""} au total).`
+      : `<strong>${c.essais_restants}</strong> analyse${c.essais_restants > 1 ? "s" : ""} gratuite${c.essais_restants > 1 ? "s" : ""} restante${c.essais_restants > 1 ? "s" : ""} sur cet appareil.`;
+  $("#mon-code").hidden = !credit;
+  $("#mon-code-valeur").textContent = credit;
+  if (c?.pack) {
+    $("#btn-acheter").textContent = `${credit ? "Recharger" : "Acheter"} ${c.pack.analyses} analyses · ${euros(c.pack.prix)}`;
+    $("#prix-analyse").textContent = `Soit ${euros(Math.round(c.pack.prix / c.pack.analyses))} l'analyse, sans abonnement ni date limite.`;
+  }
+  $("#btn-acheter").disabled = !c?.paiement_actif;
+  $("#paiement-inactif").hidden = Boolean(c?.paiement_actif) || !c;
+}
+
+$("#btn-acheter").addEventListener("click", async () => {
+  if (!$("#accepte-cgv").checked) {
+    $("#accepte-cgv").focus();
+    return toast("Coche d'abord la case des conditions de vente.", true);
+  }
+  $("#btn-acheter").disabled = true;
+  try {
+    const credit = lire(CLE_CREDIT);
+    const { url, credit: code } = await appelRelais("/achat", { accepte: true, ...(credit ? { credit } : {}) });
+    // Le code est gardé tout de suite : il sera crédité dès que Stripe confirme le paiement.
+    ecrire(CLE_CREDIT, code);
+    location.href = url;
+  } catch (err) {
+    toast(err.message, true);
+    $("#btn-acheter").disabled = false;
+  }
+});
+
+$("#btn-copier-code").addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(lire(CLE_CREDIT));
+    toast("Code copié.");
+  } catch {
+    toast("Copie impossible : note le code à la main.", true);
+  }
+});
+
+$("#btn-utiliser-code").addEventListener("click", async () => {
+  const code = $("#saisie-credit").value.trim().toUpperCase();
+  if (!code) return toast("Entre ton code NetScan (NS-XXXX-XXXX-XXXX-XXXX).", true);
+  try {
+    const compte = await appelRelais("/compte", { credit: code });
+    ecrire(CLE_CREDIT, compte.credit.code);
+    $("#saisie-credit").value = "";
+    etat.compte = compte;
+    afficherCompte();
+    majStatut();
+    toast(`Code accepté : ${compte.credit.restant} analyses disponibles.`);
+  } catch (err) {
+    toast(err.message, true);
+  }
+});
+
+// Retour de la page de paiement Stripe : ?achat=cs_… (payé) ou ?achat=annule.
+async function verifierRetourPaiement() {
+  const achat = new URLSearchParams(location.search).get("achat");
+  if (!achat || !URL_RELAIS) return;
+  history.replaceState(null, "", location.pathname);
+  if (achat === "annule") return toast("Paiement annulé : rien n'a été débité.");
+  try {
+    const { credit } = await appelRelais("/confirmer", { session_id: achat });
+    ecrire(CLE_CREDIT, credit.code);
+    toast(`Paiement reçu : tu as ${credit.restant} analyses. Garde ton code NetScan, il est aussi sur ton reçu Stripe.`);
+    afficherReglages();
+  } catch (err) {
+    toast(err.message, true);
+  }
+}
+
+verifierRetourPaiement().finally(rafraichirCompte);
+
 /* ---------- Réglages ---------- */
 
 function afficherReglages() {
@@ -929,6 +1071,8 @@ function afficherReglages() {
   // Sans serveur ni compte Claude (GitHub Pages) : on propose d'abord la version claude.ai, gratuite.
   $("#carte-claude-ai").hidden = surClaude || modeAnalyse() === "serveur";
   $("#carte-code").hidden = surClaude || !URL_RELAIS || modeAnalyse() === "serveur";
+  $("#carte-achat").hidden = surClaude || !URL_RELAIS || modeAnalyse() === "serveur";
+  rafraichirCompte();
   $("#code-acces").value = "";
   $("#etat-code").textContent = lire(CLE_CODE) ? "Code enregistré sur cet appareil." : "";
   $("#carte-cle h3").textContent = $("#carte-claude-ai").hidden ? "Clé API Anthropic" : "Ou avec une clé API Anthropic";
@@ -964,9 +1108,7 @@ function majStatut() {
   } else if (mode === "navigateur") {
     el.textContent = `Clé API enregistrée sur cet appareil · ${$("#choix-modele").selectedOptions[0].text.split(" —")[0]}`;
   } else if (mode === "relais") {
-    el.textContent = "Analyse avec la clé partagée NetScan (code d'accès).";
-  } else if (URL_RELAIS && !SUR_CLAUDE_AI) {
-    el.innerHTML = `Pour analyser tes photos, <button type="button" class="lien-texte" id="lien-reglages">entre le code d'accès NetScan</button> ou ta propre clé API. L'exemple fonctionne sans.`;
+    el.innerHTML = texteStatutRelais();
   } else {
     el.innerHTML = `Pour analyser tes photos sans clé, <a class="lien-texte" href="https://claude.ai/artifact/H1swDNTebB1nnT7PFtLmUS" target="_blank" rel="noopener">ouvre NetScan sur claude.ai</a>, ou <button type="button" class="lien-texte" id="lien-reglages">ajoute une clé API</button>. L'exemple fonctionne sans.`;
   }

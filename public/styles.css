@@ -228,6 +228,14 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .carte-sans-cle { border: 2px solid var(--accent); }
 .carte-sans-cle .btn-principal { text-decoration: none; box-sizing: border-box; margin: 4px 0 8px; }
 .petit { font-size: 0.82rem; }
+.solde { font-size: 1rem; }
+.solde strong { font-size: 1.4rem; font-variant-numeric: tabular-nums; color: var(--accent); }
+.mon-code { display: grid; gap: 6px; margin: 4px 0 12px; padding: 10px 12px; border-radius: 10px; background: var(--carte-2); }
+.ligne-code { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.ligne-code code { font: 700 1rem ui-monospace, Consolas, monospace; letter-spacing: 0.04em; overflow-wrap: anywhere; }
+.case-cgv { align-items: flex-start; margin: 8px 0 4px; }
+.case-cgv input { margin-top: 3px; }
+.case-cgv a { color: var(--accent); }
 
 /* Mon matériel */
 .materiel { margin: 4px 0 8px; }

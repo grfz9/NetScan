@@ -24,6 +24,15 @@ La clé est enregistrée uniquement dans ton navigateur, sur ton appareil, et n'
 
 Sans clé, le bouton **« Voir un exemple sans clé API »** montre une analyse complète de démonstration.
 
+## Packs d'analyses (paiement Stripe)
+
+Sur le site, chaque appareil a **2 analyses gratuites**, puis on achète un **pack de 20 analyses à 2,99 €** (Réglages → Mon compte NetScan). Le paiement passe par Stripe Checkout ; l'achat donne un **code NetScan** (`NS-XXXX-XXXX-XXXX-XXXX`) qui marche sur tous les appareils et figure sur le reçu Stripe. Une analyse n'est décomptée que si elle réussit. Les packs et essais utilisent Claude Sonnet 5.5.
+
+- Crédits et essais : base Cloudflare D1 `netscan` (tables dans `relais/schema.sql`)
+- Prix, taille des packs et essais : `[vars]` dans `relais/wrangler.toml`
+- Activer le paiement : secrets `STRIPE_SECRET_KEY` (clé restreinte, droit *Checkout Sessions : écriture*) et `STRIPE_WEBHOOK_SECRET` (webhook vers `https://netscan-relais.netscan.workers.dev/stripe-webhook`, événement `checkout.session.completed`)
+- Conditions de vente : `public/cgv.html` (informations du vendeur à compléter avant d'encaisser)
+
 ## Clé partagée avec un code d'accès
 
 Le relais `relais/` (Cloudflare Worker) garde une clé API secrète et la prête aux personnes qui ont le **code d'accès** : dans l'appli, *Réglages → Code d'accès NetScan*. La clé n'est jamais dans le code ni sur GitHub, chaque appareil est limité à 5 demandes par minute.
@@ -110,7 +119,8 @@ config, diagnostic, étapes  ◀─résultat───┘
 |---|---|
 | `server.js` | Serveur Express : sert l'interface et l'API `/api/analyse` |
 | `public/coeur.js` | Consigne envoyée à Claude, appel à l'API en streaming, et version claude.ai sans clé (partagé partout) |
-| `relais/worker.js` | Relais Cloudflare : clé API partagée derrière un code d'accès |
+| `relais/worker.js` | Relais Cloudflare : clé API, code d'accès, essais gratuits, packs payés |
+| `relais/stripe.js`, `relais/comptes.js` | Paiement Stripe et crédits d'analyses (D1) |
 | `public/config.js` | Adresse du relais |
 | `scripts/build-artifact.mjs` | Fabrique la page claude.ai à partir de `public/index.html` |
 | `public/schema.js` | Schéma JSON que la réponse doit respecter (équipements, ports, liens, config, diagnostic, étapes) |
