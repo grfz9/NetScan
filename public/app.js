@@ -21,7 +21,11 @@ const etat = {
   schemaSimple: false,
   serveur: { cle: false, modele: "" }, // ce que dit /api/statut (absent sur GitHub Pages)
   compteClaude: null, // { sample, maxPhotos } quand la page tourne sur claude.ai
+  messageCompteClaude: "Connexion à ton compte Claude…",
 };
+
+// Sur claude.ai, `window.claude` existe avant le chargement de la page : on n'y demande jamais de clé API.
+const SUR_CLAUDE_AI = Boolean(window.claude?.use);
 
 /* ---------- Stockage local (peut être bloqué en navigation privée) ---------- */
 
@@ -197,6 +201,11 @@ function marquerEtape(nom) {
 
 async function lancerAnalyse() {
   if (!etat.photos.length) return;
+  if (SUR_CLAUDE_AI && !etat.compteClaude) {
+    toast("Connexion à ton compte Claude…");
+    await connexionClaude;
+    if (!etat.compteClaude) return toast(etat.messageCompteClaude, true);
+  }
   const mode = modeAnalyse();
   if (!mode) {
     afficherReglages();
@@ -357,7 +366,7 @@ function rendreQualite(q) {
 function afficherResultat(r, { demo = false } = {}) {
   etat.resultat = r;
   $("#bandeau-demo").hidden = !demo;
-  $("#btn-demo-reglages").textContent = modeAnalyse() ? "Analyser ma photo" : "Ajouter ma clé API";
+  $("#btn-demo-reglages").textContent = modeAnalyse() || SUR_CLAUDE_AI ? "Analyser ma photo" : "Ajouter ma clé API";
   rendreQualite(r.qualite_image);
   const d = r.diagnostic ?? { statut: "indeterminable", resume: "", problemes: [], verifications: [] };
   const statut = r.type_image === "hors_sujet" ? "indeterminable" : d.statut;
@@ -673,7 +682,7 @@ $("#vue-resultat").addEventListener("click", async (e) => {
     return;
   }
   if (e.target.id === "btn-reprendre") return afficherVue("accueil");
-  if (e.target.id === "btn-demo-reglages") return modeAnalyse() ? afficherVue("accueil") : afficherReglages();
+  if (e.target.id === "btn-demo-reglages") return modeAnalyse() || SUR_CLAUDE_AI ? afficherVue("accueil") : afficherReglages();
   if (e.target.id === "btn-simplifier") {
     etat.schemaSimple = !etat.schemaSimple;
     const defilement = window.scrollY;
@@ -702,7 +711,8 @@ $("#vue-resultat").addEventListener("keydown", (e) => {
 /* ---------- Réglages ---------- */
 
 function afficherReglages() {
-  const surClaude = Boolean(etat.compteClaude);
+  const surClaude = SUR_CLAUDE_AI;
+  $("#etat-compte").textContent = etat.compteClaude ? `Connecté · ${maxPhotos()} photos max par analyse.` : etat.messageCompteClaude;
   $("#carte-compte").hidden = !surClaude;
   $("#carte-cle").hidden = surClaude;
   $("#carte-modele").hidden = surClaude;
@@ -729,6 +739,8 @@ function majStatut() {
     el.textContent = `Analyse par le serveur (${etat.serveur.modele}).`;
   } else if (mode === "claude") {
     el.textContent = `Analyse avec ton compte Claude, sans clé API · ${maxPhotos()} photos max.`;
+  } else if (SUR_CLAUDE_AI) {
+    el.textContent = etat.messageCompteClaude;
   } else if (mode === "navigateur") {
     el.textContent = `Clé API enregistrée sur cet appareil · ${$("#choix-modele").selectedOptions[0].text.split(" —")[0]}`;
   } else {
@@ -774,19 +786,29 @@ fetch("api/statut")
   })
   .catch(() => {});
 
-// Sur claude.ai, la page peut demander à Claude d'analyser les photos avec le compte de la personne.
-if (window.claude?.use) {
-  window.claude
-    .use("sample")
-    .then(async (sample) => {
-      if (!sample) return;
+// Sur claude.ai, la page demande à Claude d'analyser les photos avec le compte de la personne.
+const connexionClaude = SUR_CLAUDE_AI ? connecterCompteClaude() : Promise.resolve();
+
+async function connecterCompteClaude() {
+  try {
+    const sample = await window.claude.use("sample");
+    if (!sample) {
+      etat.messageCompteClaude =
+        "Cette page n'a pas accès à ton compte Claude ici. Ouvre-la depuis claude.ai en étant connecté.";
+    } else {
       const limites = await sample.limits().catch(() => null);
-      if (!limites?.images) return;
-      etat.compteClaude = { sample, maxPhotos: Math.min(MAX_PHOTOS, limites.images.maxCount) };
-      $("#aide-photos").textContent = `Tu peux ajouter jusqu'à ${maxPhotos()} photos : la façade de chaque équipement, l'arrière, l'écran de config, le schéma du TP…`;
-      majStatut();
-    })
-    .catch(() => {});
+      if (!limites?.images) {
+        etat.messageCompteClaude =
+          "Ici, Claude ne peut pas recevoir de photos. Ouvre la page sur claude.ai dans un navigateur (Chrome, Safari…).";
+      } else {
+        etat.compteClaude = { sample, maxPhotos: Math.min(MAX_PHOTOS, limites.images.maxCount) };
+        $("#aide-photos").textContent = `Tu peux ajouter jusqu'à ${maxPhotos()} photos : la façade de chaque équipement, l'arrière, l'écran de config, le schéma du TP…`;
+      }
+    }
+  } catch {
+    etat.messageCompteClaude = "Impossible de se connecter à ton compte Claude. Recharge la page.";
+  }
+  majStatut();
 }
 
 if ("serviceWorker" in navigator && window.isSecureContext && !window.claude) {

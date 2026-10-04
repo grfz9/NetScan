@@ -1,6 +1,6 @@
 // Service worker minimal : rend l'appli installable et garde l'interface en cache.
 // Les analyses (/api) passent toujours par le réseau.
-const CACHE = "netscan-v4";
+const CACHE = "netscan-v5";
 const FICHIERS = ["./", "index.html", "styles.css", "app.js", "rendu.js", "coeur.js", "schema.js", "icon.svg", "manifest.webmanifest"];
 
 self.addEventListener("install", (e) => {
