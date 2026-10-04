@@ -136,7 +136,14 @@ async function creerAchat(env, corps, origine) {
         price_data: {
           currency: "eur",
           unit_amount: prix,
-          product_data: { name: `NetScan : ${analyses} analyses`, description: "Analyses de photos d'équipements réseau, sans date limite." },
+          // Le prix affiché est TTC : Stripe ne rajoute pas la TVA par-dessus.
+          tax_behavior: "inclusive",
+          product_data: {
+            name: `NetScan : ${analyses} analyses`,
+            description: "Analyses de photos d'équipements réseau, sans date limite.",
+            // Exigé par les Managed Payments du compte Stripe : « IA en tant que service, cloud, usage personnel ».
+            tax_code: "txcd_10105001",
+          },
         },
       },
     ],
