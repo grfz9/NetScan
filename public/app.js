@@ -812,5 +812,16 @@ async function connecterCompteClaude() {
 }
 
 if ("serviceWorker" in navigator && window.isSecureContext && !window.claude) {
-  navigator.serviceWorker.register("sw.js").catch(() => {});
+  // updateViaCache "none" : le navigateur vérifie toujours s'il existe une nouvelle version de l'appli.
+  navigator.serviceWorker
+    .register("sw.js", { updateViaCache: "none" })
+    .then((reg) => reg.update())
+    .catch(() => {});
+  // Quand une nouvelle version prend le relais, on recharge une fois pour l'afficher.
+  let rechargee = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (rechargee || !navigator.serviceWorker.controller) return;
+    rechargee = true;
+    location.reload();
+  });
 }
