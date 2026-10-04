@@ -3,6 +3,8 @@
 # Secrets (à taper soi-même, jamais dans ce fichier) :
 #   npx wrangler secret put ANTHROPIC_API_KEY --config relais/wrangler.toml
 #   npx wrangler secret put CODE_ACCES --config relais/wrangler.toml
+#   npx wrangler secret put STRIPE_SECRET_KEY --config relais/wrangler.toml
+#   npx wrangler secret put STRIPE_WEBHOOK_SECRET --config relais/wrangler.toml
 name = "netscan-relais"
 main = "worker.js"
 compatibility_date = "2026-09-01"
@@ -16,6 +18,17 @@ namespace_id = "1001"
   limit = 5
   period = 60
 
+# Crédits d'analyses et essais gratuits (tables : relais/schema.sql).
+[[d1_databases]]
+binding = "DB"
+database_name = "netscan"
+database_id = "dd5db468-607e-4f58-ba83-9c987abe1b8b"
+
 [vars]
+# Code d'accès : modèle le plus précis. Packs et essais : modèle moins cher, pour rester rentable.
 NETSCAN_MODEL = "claude-opus-5-5"
+NETSCAN_MODEL_PAYANT = "claude-sonnet-5-5"
 NETSCAN_EFFORT = "medium"
+PRIX_CENTIMES = "299"
+ANALYSES_PAR_PACK = "20"
+ESSAIS_GRATUITS = "2"

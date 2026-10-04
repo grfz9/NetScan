@@ -118,8 +118,31 @@
     <!-- Réglages -->
     <section id="vue-reglages" class="vue" hidden>
       <h2>Réglages</h2>
+      <div class="carte carte-sans-cle" id="carte-achat" hidden>
+        <h3>Mon compte NetScan</h3>
+        <p id="solde-compte" class="solde">Chargement…</p>
+        <div id="mon-code" class="mon-code" hidden>
+          <span class="muted petit">Ton code NetScan : garde-le, il marche sur tous tes appareils et figure sur ton reçu Stripe.</span>
+          <div class="ligne-code"><code id="mon-code-valeur"></code><button type="button" class="btn-mini" id="btn-copier-code">Copier</button></div>
+        </div>
+        <label class="case case-cgv">
+          <input type="checkbox" id="accepte-cgv">
+          <span>J'accepte les <a href="cgv.html" target="_blank" rel="noopener">conditions de vente</a> et je demande l'accès immédiat aux analyses : je renonce ainsi à mon droit de rétractation.</span>
+        </label>
+        <button id="btn-acheter" class="btn-principal" type="button" disabled>Acheter 20 analyses</button>
+        <p class="muted petit" id="prix-analyse"></p>
+        <p class="muted petit" id="paiement-inactif" hidden>Le paiement n'est pas encore ouvert.</p>
+        <details>
+          <summary>J'ai déjà un code NetScan</summary>
+          <div class="ajout-materiel">
+            <label class="visuellement-cache" for="saisie-credit">Code NetScan</label>
+            <input id="saisie-credit" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="NS-XXXX-XXXX-XXXX-XXXX" maxlength="30">
+            <button id="btn-utiliser-code" class="btn-mini" type="button">Utiliser</button>
+          </div>
+        </details>
+      </div>
       <div class="carte carte-sans-cle" id="carte-code" hidden>
-        <h3>Code d'accès NetScan</h3>
+        <h3>Code d'accès (accès offert)</h3>
         <p class="muted">Si on t'a donné un code d'accès, entre-le ici : tes analyses utiliseront la clé partagée de NetScan, sans rien payer ni créer de compte.</p>
         <label class="champ" for="code-acces">
           <span>Code</span>
