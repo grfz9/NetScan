@@ -82,6 +82,45 @@ async function compresser(fichier, cote = 1568, qualite = 0.85) {
   }
 }
 
+// Repère une photo floue ou trop sombre directement sur l'appareil, avant l'envoi.
+// Netteté = variance du laplacien (peu de contours nets = image floue). Simple indice : Claude juge aussi.
+async function mesurerQualite(dataUrl) {
+  const img = new Image();
+  img.src = dataUrl;
+  await img.decode();
+  const echelle = Math.min(1, 512 / Math.max(img.naturalWidth, img.naturalHeight));
+  const w = Math.round(img.naturalWidth * echelle);
+  const h = Math.round(img.naturalHeight * echelle);
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  ctx.drawImage(img, 0, 0, w, h);
+  const px = ctx.getImageData(0, 0, w, h).data;
+  const gris = new Float32Array(w * h);
+  let lumiere = 0;
+  for (let i = 0; i < w * h; i++) {
+    gris[i] = 0.299 * px[i * 4] + 0.587 * px[i * 4 + 1] + 0.114 * px[i * 4 + 2];
+    lumiere += gris[i];
+  }
+  let somme = 0;
+  let sommeCarres = 0;
+  let n = 0;
+  for (let y = 1; y < h - 1; y++) {
+    for (let x = 1; x < w - 1; x++) {
+      const i = y * w + x;
+      const lap = 4 * gris[i] - gris[i - 1] - gris[i + 1] - gris[i - w] - gris[i + w];
+      somme += lap;
+      sommeCarres += lap * lap;
+      n++;
+    }
+  }
+  const variance = sommeCarres / n - (somme / n) ** 2;
+  return { floue: variance < SEUIL_FLOU, sombre: lumiere / (w * h) < SEUIL_SOMBRE, variance };
+}
+const SEUIL_FLOU = 60;
+const SEUIL_SOMBRE = 45;
+
 async function miniatureDepuis(dataUrl, cote = 160) {
   const img = new Image();
   img.src = dataUrl;
@@ -102,7 +141,14 @@ async function ajouterPhotos(fichiers) {
     }
     try {
       const apercu = await compresser(f);
-      etat.photos.push({ apercu, media_type: "image/jpeg", data: apercu.split(",")[1] });
+      const qualite = await mesurerQualite(apercu).catch(() => ({}));
+      etat.photos.push({ apercu, qualite, media_type: "image/jpeg", data: apercu.split(",")[1] });
+      if (qualite.floue || qualite.sombre) {
+        toast(
+          `Cette photo semble ${qualite.floue ? "floue" : "trop sombre"} : reprends-la si tu peux, l'analyse sera plus fiable.`,
+          true
+        );
+      }
     } catch {
       toast("Impossible de lire cette image.", true);
     }
@@ -115,6 +161,7 @@ function afficherMiniatures() {
   zone.innerHTML = etat.photos
     .map(
       (p, i) => `<div class="miniature"><img src="${p.apercu}" alt="Photo ${i + 1}">
+        ${p.qualite?.floue ? `<span class="badge">floue ?</span>` : p.qualite?.sombre ? `<span class="badge">sombre</span>` : ""}
         <button type="button" data-retirer="${i}" aria-label="Retirer la photo ${i + 1}">×</button></div>`
     )
     .join("");
@@ -225,7 +272,7 @@ async function lancerDemo() {
       marquerEtape(e);
       await new Promise((r) => setTimeout(r, 380));
     }
-    afficherResultat(resultat);
+    afficherResultat(resultat, { demo: true });
   } catch {
     afficherVue("accueil");
     toast("Impossible de charger l'exemple.", true);
@@ -256,8 +303,36 @@ const SOURCES_CONFIG = {
 };
 const GRAVITES = { bloquant: ["Bloquant", "ko"], important: ["Important", "warn"], conseil: ["Conseil", "accent"] };
 
-function afficherResultat(r) {
+const DEFAUTS_PHOTO = {
+  floue: "floue",
+  sombre: "trop sombre",
+  reflets: "reflets",
+  trop_loin: "prise de trop loin",
+  coupee: "équipement coupé",
+  cables_emmeles: "câbles difficiles à suivre",
+  angle: "mauvais angle",
+};
+
+function rendreQualite(q) {
+  const el = $("#alerte-qualite");
+  el.hidden = !q || q.niveau === "bonne";
+  if (el.hidden) return;
+  const insuffisante = q.niveau === "insuffisante";
+  const defauts = (q.problemes ?? []).map((p) => DEFAUTS_PHOTO[p] ?? p).join(", ");
+  el.className = `alerte-qualite ${q.niveau}`;
+  el.innerHTML = `<div class="symbole" aria-hidden="true">📷</div>
+    <div>
+      <strong>${insuffisante ? "Photo inexploitable : impossible de conclure" : "Photo de qualité moyenne : analyse peut-être incomplète"}${defauts ? ` (${echapper(defauts)})` : ""}</strong>
+      ${q.detail ? `<p>${echapper(q.detail)}</p>` : ""}
+      ${q.conseil ? `<p><b>Conseil :</b> ${echapper(q.conseil)}</p>` : ""}
+      <button type="button" class="btn-mini" id="btn-reprendre">Reprendre une photo</button>
+    </div>`;
+}
+
+function afficherResultat(r, { demo = false } = {}) {
   etat.resultat = r;
+  $("#bandeau-demo").hidden = !demo;
+  rendreQualite(r.qualite_image);
   const d = r.diagnostic ?? { statut: "indeterminable", resume: "", problemes: [], verifications: [] };
   const statut = r.type_image === "hors_sujet" ? "indeterminable" : d.statut;
   const v = VERDICTS[statut] ?? VERDICTS.indeterminable;
@@ -571,6 +646,8 @@ $("#vue-resultat").addEventListener("click", async (e) => {
     if (i >= 0) document.getElementById(`equipement-${i}`).scrollIntoView({ behavior: "smooth", block: "start" });
     return;
   }
+  if (e.target.id === "btn-reprendre") return afficherVue("accueil");
+  if (e.target.id === "btn-demo-reglages") return afficherReglages();
   if (e.target.id === "btn-simplifier") {
     etat.schemaSimple = !etat.schemaSimple;
     const defilement = window.scrollY;

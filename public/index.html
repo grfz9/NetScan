@@ -76,6 +76,12 @@
 
     <!-- Résultat -->
     <section id="vue-resultat" class="vue" hidden>
+      <div id="bandeau-demo" class="bandeau-demo" hidden>
+        <strong>Exemple de démonstration</strong>
+        <p>Ce résultat est un exemple fixe : ce n'est pas l'analyse de ta photo. Pour analyser tes propres photos, ajoute ta clé API.</p>
+        <button type="button" class="btn-mini" id="btn-demo-reglages">Ajouter ma clé API</button>
+      </div>
+      <div id="alerte-qualite" hidden></div>
       <div id="verdict" class="verdict"></div>
       <nav class="onglets" role="tablist">
         <button role="tab" data-onglet="schema" aria-selected="true">Schéma</button>

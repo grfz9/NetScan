@@ -84,6 +84,18 @@ export const SCHEMA_ANALYSE = obj({
     ["equipement_physique", "ecran_configuration", "schema_topologie", "mixte", "hors_sujet"],
     "Nature de ce qui a été photographié"
   ),
+  qualite_image: obj({
+    niveau: enumStr(
+      ["bonne", "moyenne", "insuffisante"],
+      "bonne = tout est lisible ; moyenne = certains détails illisibles ; insuffisante = impossible de conclure"
+    ),
+    problemes: arr(
+      enumStr(["floue", "sombre", "reflets", "trop_loin", "coupee", "cables_emmeles", "angle"]),
+      "Défauts de la photo qui gênent l'analyse"
+    ),
+    detail: str("Ce qui n'a pas pu être lu à cause de la qualité (ex : numéros de ports du switch du bas). Chaîne vide si rien"),
+    conseil: str("Comment reprendre la photo pour un meilleur résultat. Chaîne vide si la qualité est bonne"),
+  }),
   titre: str("Titre court de l'analyse"),
   resume: str("Ce que montre la photo, en 1 à 3 phrases"),
   equipements: arr(equipement, "Équipements identifiés"),

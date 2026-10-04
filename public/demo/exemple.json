@@ -1,5 +1,11 @@
 {
   "type_image": "mixte",
+  "qualite_image": {
+    "niveau": "moyenne",
+    "problemes": ["reflets"],
+    "detail": "Un reflet sur l'écran du PC de console cache la fin de la configuration du routeur.",
+    "conseil": "Photographie l'écran un peu de côté pour éviter le reflet, ou fais une capture d'écran directement sur le PC."
+  },
   "titre": "TP routage inter-VLAN (router-on-a-stick)",
   "resume": "Un routeur Cisco 2911 et un switch Catalyst 2960-24TT dans une baie de TP, avec deux PC branchés sur le switch. L'écran du PC de console affiche une partie de la configuration du routeur.",
   "equipements": [

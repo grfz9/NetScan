@@ -309,6 +309,44 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .verdict.non_fonctionnel .pastille { background: var(--ko); }
 .verdict.non_fonctionnel .etiquette { color: var(--ko); }
 
+.bandeau-demo {
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  border-radius: var(--rayon);
+  border: 2px dashed var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+.bandeau-demo strong { display: block; color: var(--accent); margin-bottom: 2px; }
+.bandeau-demo p { margin: 0 0 10px; font-size: 0.92rem; }
+
+.alerte-qualite {
+  display: flex;
+  gap: 12px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  border-radius: var(--rayon);
+  background: var(--warn-fond);
+  border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent);
+}
+.alerte-qualite.insuffisante { background: var(--ko-fond); border-color: color-mix(in srgb, var(--ko) 40%, transparent); }
+.alerte-qualite .symbole { font-size: 24px; line-height: 1; }
+.alerte-qualite strong { display: block; color: var(--warn); }
+.alerte-qualite.insuffisante strong { color: var(--ko); }
+.alerte-qualite p { margin: 4px 0 0; font-size: 0.92rem; }
+.alerte-qualite .btn-mini { margin-top: 10px; }
+
+.miniature .badge {
+  position: absolute;
+  left: 4px;
+  bottom: 4px;
+  padding: 1px 6px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: var(--warn);
+  color: #1a1200;
+}
+
 .onglets {
   position: sticky;
   top: 61px;
