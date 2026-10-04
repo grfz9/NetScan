@@ -78,7 +78,76 @@ const STYLE_CABLE = {
 
 const tronquer = (texte, max) => (texte.length > max ? texte.slice(0, max - 1) + "…" : texte);
 
-export function dessinerTopologie(resultat) {
+// Postes « en bout de chaîne » qu'on peut regrouper dans la vue simplifiée.
+const TERMINAUX = {
+  pc: "PC",
+  imprimante: "imprimantes",
+  telephone_ip: "téléphones IP",
+  serveur: "serveurs",
+  point_acces: "bornes Wi-Fi",
+};
+
+export const schemaComplexe = (r) => r.equipements.length >= 4 || r.liens.length >= 4;
+
+// Vue simplifiée : les postes identiques reliés au même équipement deviennent un seul
+// bloc (« 3 PC »), les câbles en double sont fusionnés et les noms de ports sont masqués.
+function simplifier(resultat) {
+  const voisins = new Map();
+  const ajouter = (a, b) => (voisins.get(a) ?? voisins.set(a, new Set()).get(a)).add(b);
+  for (const l of resultat.liens) {
+    if (l.de === l.vers) continue;
+    ajouter(l.de, l.vers);
+    ajouter(l.vers, l.de);
+  }
+
+  const groupes = new Map();
+  for (const e of resultat.equipements) {
+    const v = [...(voisins.get(e.id) ?? [])];
+    if (!TERMINAUX[e.type] || v.length > 1) continue;
+    const cle = `${e.type}|${v[0] ?? ""}`;
+    (groupes.get(cle) ?? groupes.set(cle, []).get(cle)).push(e);
+  }
+
+  const remplace = new Map();
+  const equipements = [];
+  for (const [cle, membres] of groupes) {
+    if (membres.length < 2) continue;
+    const [type, voisin] = cle.split("|");
+    const id = `groupe:${cle}`;
+    membres.forEach((m) => remplace.set(m.id, id));
+    equipements.push({
+      id,
+      etiquette: `${membres.length} ${TERMINAUX[type]}`,
+      nom: membres.map((m) => m.id).join(", "),
+      modele: membres.map((m) => m.id).join(", "),
+      type,
+      ports: [],
+      voisin,
+    });
+  }
+  const versId = (id) => remplace.get(id) ?? id;
+  equipements.unshift(...resultat.equipements.filter((e) => !remplace.has(e.id)));
+
+  const vus = new Set();
+  const liens = [];
+  for (const l of resultat.liens) {
+    const de = versId(l.de);
+    const vers = versId(l.vers);
+    const cle = [de, vers].sort().join("|");
+    if (de === vers || vus.has(cle)) continue;
+    vus.add(cle);
+    liens.push({ ...l, de, vers, port_de: "", port_vers: "" });
+  }
+
+  const problemes = (resultat.diagnostic?.problemes ?? []).map((p) => ({
+    ...p,
+    concerne: (p.concerne ?? []).map(versId),
+  }));
+  return { ...resultat, equipements, liens, diagnostic: { ...resultat.diagnostic, problemes } };
+}
+
+export function dessinerTopologie(source, { simple = false } = {}) {
+  const resultat = simple ? simplifier(source) : source;
   const noeuds = resultat.equipements.map((e) => ({ ...e }));
   const parId = new Map(noeuds.map((n) => [n.id, n]));
   // Un lien vers un id absent crée un équipement inconnu plutôt que de disparaître.
@@ -205,7 +274,7 @@ export function dessinerTopologie(resultat) {
     blocs += `<g class="noeud" data-id="${echapper(n.id)}" tabindex="0" role="button" aria-label="${echapper(n.id + " " + (n.nom || ""))}">
       ${icone(n.type, 48, x - 24, y - 24)}
       ${pastille}
-      <text class="noeud-nom" x="${x + 32}" y="${y - 2}">${echapper(tronquer(n.id, 14))}</text>
+      <text class="noeud-nom" x="${x + 32}" y="${y - 2}">${echapper(tronquer(n.etiquette ?? n.id, 14))}</text>
       <text class="noeud-sous" x="${x + 32}" y="${y + 12}">${echapper(sous)}</text>
     </g>`;
   }

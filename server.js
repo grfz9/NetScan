@@ -3,7 +3,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import express from "express";
 import Anthropic from "@anthropic-ai/sdk";
-import { analyser, modele, ErreurAnalyse } from "./src/analyse.js";
+import { analyser, modele } from "./src/analyse.js";
+import { MAX_PHOTOS, messageErreur } from "./public/coeur.js";
 
 try {
   process.loadEnvFile();
@@ -14,10 +15,9 @@ try {
 const ici = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT) || 3000;
 const TYPES_IMAGE = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-const MAX_IMAGES = 4;
 
 const app = express();
-app.use(express.json({ limit: "25mb" }));
+app.use(express.json({ limit: "40mb" }));
 app.use(express.static(path.join(ici, "public")));
 
 app.get("/api/statut", (req, res) => {
@@ -31,8 +31,8 @@ app.get("/api/statut", (req, res) => {
 app.post("/api/analyse", async (req, res) => {
   const { images, contexte = "" } = req.body ?? {};
 
-  if (!Array.isArray(images) || images.length === 0 || images.length > MAX_IMAGES) {
-    return res.status(400).json({ erreur: `Envoie entre 1 et ${MAX_IMAGES} photos.` });
+  if (!Array.isArray(images) || images.length === 0 || images.length > MAX_PHOTOS) {
+    return res.status(400).json({ erreur: `Envoie entre 1 et ${MAX_PHOTOS} photos.` });
   }
   const invalide = images.some(
     (img) => !TYPES_IMAGE.includes(img?.media_type) || typeof img?.data !== "string" || !img.data
@@ -59,36 +59,10 @@ app.post("/api/analyse", async (req, res) => {
     envoyer({ resultat, modele: utilise });
   } catch (err) {
     console.error(err);
-    envoyer({ erreur: messageErreur(err) });
+    envoyer({ erreur: messageErreur(err, Anthropic) });
   }
   res.end();
 });
-
-function messageErreur(err) {
-  if (err instanceof ErreurAnalyse) return err.message;
-  if (err instanceof Anthropic.AuthenticationError) {
-    return "Clé API invalide. Vérifie ANTHROPIC_API_KEY dans le fichier .env puis relance le serveur.";
-  }
-  if (err instanceof Anthropic.PermissionDeniedError) {
-    return "Cette clé API n'a pas accès au modèle demandé.";
-  }
-  if (err instanceof Anthropic.RateLimitError) {
-    return "Trop de demandes d'un coup. Attends quelques secondes et réessaie.";
-  }
-  if (err instanceof Anthropic.BadRequestError) {
-    return `Requête refusée par l'API : ${err.message}`;
-  }
-  if (err instanceof Anthropic.APIConnectionError) {
-    return "Impossible de joindre l'API Claude. Vérifie ta connexion Internet.";
-  }
-  if (err instanceof Anthropic.APIError) {
-    return `Erreur de l'API Claude (${err.status ?? "?"}). Réessaie dans un instant.`;
-  }
-  if (/api.?key|credential|auth/i.test(String(err?.message))) {
-    return "Aucune clé API trouvée. Copie .env.example en .env, ajoute ta clé ANTHROPIC_API_KEY et relance le serveur.";
-  }
-  return "Erreur inattendue pendant l'analyse.";
-}
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`\nNetScan est lancé :`);

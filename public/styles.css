@@ -205,7 +205,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
 .champ { display: grid; gap: 6px; margin: 16px 0 8px; font-weight: 600; }
 .champ em { font-weight: 400; color: var(--texte-2); }
-.champ textarea {
+.champ textarea, .champ input, .champ select {
   width: 100%;
   resize: vertical;
   padding: 12px;
@@ -216,6 +216,12 @@ button { font: inherit; color: inherit; cursor: pointer; }
   font: inherit;
   font-weight: 400;
 }
+
+.barre-actions { display: flex; gap: 8px; }
+.actions-ligne { display: flex; gap: 10px; margin: 4px 0 10px; }
+.actions-ligne > * { flex: 1; margin-top: 0; }
+.aide a, .lien-texte { color: var(--accent); font-weight: 600; background: none; border: 0; padding: 0; text-decoration: underline; text-underline-offset: 3px; }
+.vue > h2 { margin: 8px 0 14px; }
 
 /* Chargement */
 .scan {
@@ -362,6 +368,19 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .topologie .port-fond { fill: var(--carte); stroke: var(--bord); }
 .topologie .icone { color: var(--texte); }
 .topologie .noeud { cursor: pointer; }
+.entete-schema { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.entete-schema h3 { margin: 0; }
+.btn-mini {
+  flex: none;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--bord);
+  background: var(--carte-2);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.btn-mini[aria-pressed="true"] { background: var(--accent); color: var(--accent-texte); border-color: var(--accent); }
+.note-schema { font-size: 0.85rem; color: var(--texte-2); margin: 6px 0 0; }
 .legende { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.8rem; color: var(--texte-2); margin-top: 10px; }
 .legende span { display: inline-flex; align-items: center; gap: 6px; }
 .legende i { display: inline-block; width: 22px; border-top: 2px solid var(--lien); }

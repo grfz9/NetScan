@@ -8,9 +8,23 @@
 - ✅ **le diagnostic** : est-ce que ça fonctionne ? Ce qui manque ou ce qui est faux, et comment le corriger ;
 - 🧠 **les étapes du raisonnement**, une par une, comme Photomath.
 
+Tu peux envoyer **jusqu'à 10 photos** pour une même analyse (façades, arrière, écran de config, schéma du TP…), et le bouton **« Simplifier le schéma »** regroupe les postes identiques quand le schéma est chargé.
+
 L'analyse d'image est faite par l'API Claude (Anthropic), avec une réponse au format JSON imposé, ensuite dessinée par l'appli.
 
-## Démarrer
+## Utiliser l'appli en ligne
+
+👉 **https://grfz9.github.io/NetScan/**
+
+1. Ouvre le lien sur ton téléphone (tu peux l'ajouter à l'écran d'accueil comme une appli).
+2. Va dans **Réglages** (icône ⚙️) et colle ta clé API Anthropic.
+3. Prends ta photo et appuie sur **Analyser**.
+
+La clé est enregistrée uniquement dans ton navigateur, sur ton appareil, et n'est envoyée qu'à l'API d'Anthropic. Elle n'est jamais dans le code ni sur GitHub. Chaque personne qui utilise le site met sa propre clé.
+
+Sans clé, le bouton **« Voir un exemple sans clé API »** montre une analyse complète de démonstration.
+
+## Lancer en local (avec le serveur Node)
 
 Il faut [Node.js](https://nodejs.org) 20.12 ou plus récent.
 
@@ -22,23 +36,21 @@ cp .env.example .env    # puis colle ta clé dans ANTHROPIC_API_KEY
 npm start
 ```
 
-Ouvre ensuite http://localhost:3000.
-
-> Sans clé API, le bouton **« Voir un exemple sans clé API »** montre une analyse complète de démonstration (TP de routage inter-VLAN).
+Ouvre ensuite http://localhost:3000. Avec une clé dans `.env`, c'est le serveur qui appelle Claude (la clé ne quitte pas ton PC). Sans `.env`, l'appli utilise la clé enregistrée dans ses Réglages, comme sur GitHub Pages.
 
 ### Obtenir une clé API
 
 1. Crée un compte sur [console.anthropic.com](https://console.anthropic.com).
 2. Ajoute quelques euros de crédit (l'API est payante à l'usage, séparément de l'abonnement Claude.ai).
-3. Crée une clé dans *Settings → API Keys* et colle-la dans le fichier `.env`.
+3. Crée une clé dans *Settings → API Keys* et colle-la dans les Réglages de l'appli (ou dans le fichier `.env` en local).
 
-Le fichier `.env` est ignoré par Git : ta clé ne part jamais sur GitHub.
+Le fichier `.env` est ignoré par Git : ta clé ne part jamais sur GitHub. **Ne mets jamais ta clé dans le code** : le dépôt et le site sont publics.
 
 ### Utiliser l'appli sur ton téléphone
 
 Au démarrage, le serveur affiche une adresse du type `http://192.168.1.20:3000`. Ouvre-la sur ton téléphone connecté **au même Wi-Fi** que ton PC : le bouton « Prendre une photo » ouvre directement l'appareil photo.
 
-Pour l'utiliser partout (en cours, en stage), il faut héberger le serveur en ligne (Render, Railway, Fly.io…) en ajoutant `ANTHROPIC_API_KEY` dans les variables d'environnement de l'hébergeur. L'appli peut alors être installée sur l'écran d'accueil (PWA).
+Pour l'utiliser partout (en cours, en stage), le plus simple est la version en ligne sur GitHub Pages (voir plus haut).
 
 ## Réglages (fichier `.env`)
 
@@ -72,10 +84,12 @@ config, diagnostic, étapes  ◀─résultat───┘
 | Fichier | Rôle |
 |---|---|
 | `server.js` | Serveur Express : sert l'interface et l'API `/api/analyse` |
-| `src/analyse.js` | Consigne envoyée à Claude, appel à l'API en streaming |
-| `src/schema.js` | Schéma JSON que la réponse doit respecter (équipements, ports, liens, config, diagnostic, étapes) |
-| `public/app.js` | Interface : photos, envoi, onglets, historique |
-| `public/rendu.js` | Dessin en SVG du schéma réseau et des façades |
+| `public/coeur.js` | Consigne envoyée à Claude et appel à l'API en streaming (partagé par le serveur et le navigateur) |
+| `public/schema.js` | Schéma JSON que la réponse doit respecter (équipements, ports, liens, config, diagnostic, étapes) |
+| `src/analyse.js` | Branche le cœur de l'analyse sur la clé du serveur |
+| `public/app.js` | Interface : photos, envoi, onglets, réglages, historique |
+| `public/rendu.js` | Dessin en SVG du schéma réseau (vue détaillée ou simplifiée) et des façades |
+| `.github/workflows/pages.yml` | Publie le dossier `public/` sur GitHub Pages à chaque push |
 | `public/demo/exemple.json` | Résultat de démonstration |
 
 L'historique des analyses est gardé dans le navigateur (localStorage), sur l'appareil.

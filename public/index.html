@@ -16,9 +16,14 @@
       <img src="icon.svg" alt="" width="28" height="28">
       <span>NetScan</span>
     </button>
-    <button class="btn-icone" id="btn-historique" type="button" aria-label="Historique">
-      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 7v5l3 2M3 12a9 9 0 1 0 3-6.7M3 4v4h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
+    <div class="barre-actions">
+      <button class="btn-icone" id="btn-historique" type="button" aria-label="Historique">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 7v5l3 2M3 12a9 9 0 1 0 3-6.7M3 4v4h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="btn-icone" id="btn-reglages" type="button" aria-label="Réglages">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1L7 17M17 7l2.1-2.1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
   </header>
 
   <main>
@@ -40,7 +45,7 @@
       </div>
 
       <div id="miniatures" class="miniatures" hidden></div>
-      <p class="aide" id="aide-photos" hidden>Tu peux ajouter jusqu'à 4 photos (ex : la façade du switch + l'écran de config).</p>
+      <p class="aide" id="aide-photos" hidden>Tu peux ajouter jusqu'à 10 photos : la façade de chaque équipement, l'arrière, l'écran de config, le schéma du TP…</p>
 
       <label class="champ" for="contexte">
         <span>Consigne ou contexte <em>(facultatif)</em></span>
@@ -83,6 +88,42 @@
       <div class="panneau" id="onglet-diagnostic" role="tabpanel" hidden></div>
       <div class="panneau" id="onglet-etapes" role="tabpanel" hidden></div>
       <button id="btn-nouvelle" class="btn-principal" type="button">Nouvelle photo</button>
+    </section>
+
+    <!-- Réglages -->
+    <section id="vue-reglages" class="vue" hidden>
+      <h2>Réglages</h2>
+      <div class="carte">
+        <h3>Clé API Anthropic</h3>
+        <p class="muted">Nécessaire pour analyser tes photos. Elle est enregistrée uniquement sur cet appareil, et envoyée seulement à l'API d'Anthropic. Elle n'est jamais publiée sur GitHub.</p>
+        <label class="champ" for="cle-api">
+          <span>Clé</span>
+          <input id="cle-api" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="sk-ant-…">
+        </label>
+        <div class="actions-ligne">
+          <button id="btn-enregistrer-cle" class="btn-principal" type="button">Enregistrer</button>
+          <button id="btn-supprimer-cle" class="btn-secondaire" type="button">Supprimer</button>
+        </div>
+        <p class="muted" id="etat-cle"></p>
+        <details>
+          <summary>Comment obtenir une clé ?</summary>
+          <ol class="muted">
+            <li>Crée un compte sur <a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a>.</li>
+            <li>Ajoute un peu de crédit (Billing). L'API est payante à l'usage : quelques centimes par analyse, séparément de l'abonnement Claude.ai.</li>
+            <li>Va dans Settings → API Keys → Create Key, puis colle la clé ici.</li>
+          </ol>
+        </details>
+      </div>
+      <div class="carte">
+        <h3>Modèle</h3>
+        <label class="champ" for="choix-modele">
+          <span>Modèle utilisé pour l'analyse</span>
+          <select id="choix-modele">
+            <option value="claude-opus-5-5">Claude Opus 5.5 — le plus précis (recommandé)</option>
+            <option value="claude-sonnet-5-5">Claude Sonnet 5.5 — environ 2 fois moins cher</option>
+          </select>
+        </label>
+      </div>
     </section>
 
     <!-- Historique -->

@@ -1,18 +1,53 @@
-import { echapper, icone, NOMS_TYPE, dessinerTopologie, dessinerFacade, colorerCommandes } from "./rendu.js";
+import { echapper, icone, NOMS_TYPE, dessinerTopologie, dessinerFacade, colorerCommandes, schemaComplexe } from "./rendu.js";
+import { MAX_PHOTOS, MODELE_PAR_DEFAUT, analyserAvec, messageErreur } from "./coeur.js";
 
 const $ = (sel) => document.querySelector(sel);
-const MAX_PHOTOS = 4;
 const CLE_HISTORIQUE = "netscan.historique";
+const CLE_API = "netscan.cleApi";
+const CLE_MODELE = "netscan.modele";
+// SDK officiel d'Anthropic, chargé seulement si l'analyse se fait depuis le navigateur.
+const URL_SDK = "https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@0.131.0/+esm";
 
 const etat = {
   photos: [], // { data, media_type, apercu }
   resultat: null,
+  schemaSimple: false,
+  serveur: { cle: false, modele: "" }, // ce que dit /api/statut (absent sur GitHub Pages)
 };
+
+/* ---------- Stockage local (peut être bloqué en navigation privée) ---------- */
+
+function lire(cle) {
+  try {
+    return localStorage.getItem(cle) ?? "";
+  } catch {
+    return "";
+  }
+}
+
+function ecrire(cle, valeur) {
+  try {
+    if (valeur) localStorage.setItem(cle, valeur);
+    else localStorage.removeItem(cle);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+const modeleChoisi = () => lire(CLE_MODELE) || MODELE_PAR_DEFAUT;
+
+// "serveur" si le serveur Node a sa propre clé, "navigateur" si une clé est enregistrée ici.
+function modeAnalyse() {
+  if (etat.serveur.cle) return "serveur";
+  if (lire(CLE_API)) return "navigateur";
+  return null;
+}
 
 /* ---------- Navigation entre les vues ---------- */
 
 function afficherVue(nom) {
-  for (const v of ["accueil", "chargement", "resultat", "historique"]) {
+  for (const v of ["accueil", "chargement", "resultat", "historique", "reglages"]) {
     $(`#vue-${v}`).hidden = v !== nom;
   }
   window.scrollTo({ top: 0 });
@@ -105,51 +140,78 @@ function marquerEtape(nom) {
 
 async function lancerAnalyse() {
   if (!etat.photos.length) return;
+  const mode = modeAnalyse();
+  if (!mode) {
+    afficherReglages();
+    toast("Ajoute d'abord ta clé API pour analyser tes photos.", true);
+    return;
+  }
   const contexte = $("#contexte").value.trim();
+  const images = etat.photos.map(({ data, media_type }) => ({ data, media_type }));
   $("#scan-image").src = etat.photos[0].apercu;
   marquerEtape("envoi");
   afficherVue("chargement");
 
   try {
-    const reponse = await fetch("/api/analyse", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        images: etat.photos.map(({ data, media_type }) => ({ data, media_type })),
-        contexte,
-      }),
-    });
-    if (!reponse.ok) {
-      const corps = await reponse.json().catch(() => ({}));
-      throw new Error(corps.erreur || `Erreur du serveur (${reponse.status}).`);
-    }
-
-    let resultat = null;
-    let tampon = "";
-    const lecteur = reponse.body.pipeThrough(new TextDecoderStream()).getReader();
-    for (;;) {
-      const { value, done } = await lecteur.read();
-      if (done) break;
-      tampon += value;
-      let fin;
-      while ((fin = tampon.indexOf("\n")) >= 0) {
-        const ligne = tampon.slice(0, fin).trim();
-        tampon = tampon.slice(fin + 1);
-        if (!ligne) continue;
-        const msg = JSON.parse(ligne);
-        if (msg.etape) marquerEtape(msg.etape);
-        if (msg.erreur) throw new Error(msg.erreur);
-        if (msg.resultat) resultat = msg.resultat;
-      }
-    }
-    if (!resultat) throw new Error("La connexion a été coupée avant la fin de l'analyse.");
-
+    const analyser = mode === "serveur" ? analyserViaServeur : analyserDansNavigateur;
+    const resultat = await analyser({ images, contexte, onEtape: marquerEtape });
     const vignette = await miniatureDepuis(etat.photos[0].apercu).catch(() => "");
     enregistrerHistorique({ resultat, contexte, vignette });
     afficherResultat(resultat);
   } catch (err) {
     afficherVue("accueil");
     toast(err.message || "L'analyse a échoué.", true);
+  }
+}
+
+// Mode serveur : le serveur Node appelle Claude et renvoie la progression en NDJSON.
+async function analyserViaServeur({ images, contexte, onEtape }) {
+  const reponse = await fetch("api/analyse", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ images, contexte }),
+  });
+  if (!reponse.ok) {
+    const corps = await reponse.json().catch(() => ({}));
+    throw new Error(corps.erreur || `Erreur du serveur (${reponse.status}).`);
+  }
+
+  let resultat = null;
+  let tampon = "";
+  const lecteur = reponse.body.pipeThrough(new TextDecoderStream()).getReader();
+  for (;;) {
+    const { value, done } = await lecteur.read();
+    if (done) break;
+    tampon += value;
+    let fin;
+    while ((fin = tampon.indexOf("\n")) >= 0) {
+      const ligne = tampon.slice(0, fin).trim();
+      tampon = tampon.slice(fin + 1);
+      if (!ligne) continue;
+      const msg = JSON.parse(ligne);
+      if (msg.etape) onEtape(msg.etape);
+      if (msg.erreur) throw new Error(msg.erreur);
+      if (msg.resultat) resultat = msg.resultat;
+    }
+  }
+  if (!resultat) throw new Error("La connexion a été coupée avant la fin de l'analyse.");
+  return resultat;
+}
+
+// Mode navigateur (GitHub Pages) : l'appli appelle Claude directement avec la clé enregistrée ici.
+let Anthropic;
+async function analyserDansNavigateur({ images, contexte, onEtape }) {
+  try {
+    Anthropic ??= (await import(URL_SDK)).default;
+  } catch {
+    throw new Error("Impossible de charger le SDK Anthropic. Vérifie ta connexion Internet.");
+  }
+  const client = new Anthropic({ apiKey: lire(CLE_API), dangerouslyAllowBrowser: true });
+  try {
+    const { resultat } = await analyserAvec(client, { images, contexte, onEtape, modele: modeleChoisi() });
+    return resultat;
+  } catch (err) {
+    throw new Error(messageErreur(err, Anthropic));
   }
 }
 
@@ -216,6 +278,7 @@ function afficherResultat(r) {
       ${sous.length ? `<p class="sous">${echapper(sous.join(" · "))}</p>` : ""}
     </div>`;
 
+  etat.schemaSimple = false;
   $("#onglet-schema").innerHTML = rendreSchema(r);
   $("#onglet-config").innerHTML = rendreConfig(r);
   $("#onglet-diagnostic").innerHTML = rendreDiagnostic(d);
@@ -233,9 +296,15 @@ function rendreSchema(r) {
   </div>`;
 
   if (r.equipements.length) {
+    const complexe = schemaComplexe(r);
+    const simple = complexe && etat.schemaSimple;
     html += `<div class="carte">
-      <h3>Schéma réseau</h3>
-      <div class="defile">${dessinerTopologie(r)}</div>
+      <div class="entete-schema">
+        <h3>Schéma réseau</h3>
+        ${complexe ? `<button class="btn-mini" type="button" id="btn-simplifier" aria-pressed="${simple}">${simple ? "Voir le détail" : "Simplifier le schéma"}</button>` : ""}
+      </div>
+      <div class="defile">${dessinerTopologie(r, { simple })}</div>
+      ${simple ? `<p class="note-schema">Vue simplifiée : les postes identiques sont regroupés et les noms de ports sont masqués.</p>` : ""}
       <div class="legende">
         <span><i></i>câble observé</span>
         <span><i class="deduit"></i>déduit</span>
@@ -502,6 +571,13 @@ $("#vue-resultat").addEventListener("click", async (e) => {
     if (i >= 0) document.getElementById(`equipement-${i}`).scrollIntoView({ behavior: "smooth", block: "start" });
     return;
   }
+  if (e.target.id === "btn-simplifier") {
+    etat.schemaSimple = !etat.schemaSimple;
+    const defilement = window.scrollY;
+    $("#onglet-schema").innerHTML = rendreSchema(etat.resultat);
+    window.scrollTo({ top: defilement });
+    return;
+  }
   if (e.target.id === "btn-etape-suivante") {
     etapesVisibles++;
     majEtapes();
@@ -520,12 +596,72 @@ $("#vue-resultat").addEventListener("keydown", (e) => {
   }
 });
 
-fetch("/api/statut")
-  .then((r) => r.json())
-  .then((s) => {
-    $("#statut-api").textContent = s.cle_configuree
-      ? `Analyse par ${s.modele}`
-      : "Aucune clé API configurée sur le serveur : seul l'exemple fonctionne pour l'instant.";
+/* ---------- Réglages ---------- */
+
+function afficherReglages() {
+  $("#cle-api").value = "";
+  $("#choix-modele").value = modeleChoisi();
+  majEtatCle();
+  afficherVue("reglages");
+}
+
+function majEtatCle() {
+  const cle = lire(CLE_API);
+  $("#etat-cle").textContent = cle
+    ? `Clé enregistrée sur cet appareil (…${cle.slice(-4)}).`
+    : etat.serveur.cle
+      ? "Pas de clé sur cet appareil : c'est la clé du serveur qui est utilisée."
+      : "Aucune clé enregistrée.";
+  majStatut();
+}
+
+function majStatut() {
+  const el = $("#statut-api");
+  const mode = modeAnalyse();
+  if (mode === "serveur") {
+    el.textContent = `Analyse par le serveur (${etat.serveur.modele}).`;
+  } else if (mode === "navigateur") {
+    el.textContent = `Clé API enregistrée sur cet appareil · ${$("#choix-modele").selectedOptions[0].text.split(" —")[0]}`;
+  } else {
+    el.innerHTML = `Pour analyser tes photos, <button type="button" class="lien-texte" id="lien-reglages">ajoute ta clé API</button>. L'exemple fonctionne sans.`;
+  }
+}
+
+$("#btn-reglages").addEventListener("click", afficherReglages);
+$("#statut-api").addEventListener("click", (e) => {
+  if (e.target.id === "lien-reglages") afficherReglages();
+});
+
+$("#btn-enregistrer-cle").addEventListener("click", () => {
+  const cle = $("#cle-api").value.trim();
+  if (!cle) return toast("Colle d'abord ta clé dans le champ.", true);
+  if (!cle.startsWith("sk-ant-")) return toast("Une clé Anthropic commence par « sk-ant- ».", true);
+  if (!ecrire(CLE_API, cle)) return toast("Impossible d'enregistrer la clé (navigation privée ?).", true);
+  $("#cle-api").value = "";
+  majEtatCle();
+  toast("Clé enregistrée sur cet appareil.");
+});
+
+$("#btn-supprimer-cle").addEventListener("click", () => {
+  ecrire(CLE_API, "");
+  majEtatCle();
+  toast("Clé supprimée de cet appareil.");
+});
+
+$("#choix-modele").addEventListener("change", (e) => {
+  ecrire(CLE_MODELE, e.target.value);
+  majStatut();
+});
+
+$("#choix-modele").value = modeleChoisi();
+majStatut();
+
+// Sur GitHub Pages il n'y a pas de serveur : cette requête échoue et on reste en mode navigateur.
+fetch("api/statut")
+  .then((r) => (r.ok ? r.json() : null))
+  .then((statut) => {
+    if (statut) etat.serveur = { cle: statut.cle_configuree, modele: statut.modele };
+    majStatut();
   })
   .catch(() => {});
 
