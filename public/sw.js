@@ -1,0 +1,31 @@
+// Service worker minimal : rend l'appli installable et garde l'interface en cache.
+// Les analyses (/api) passent toujours par le réseau.
+const CACHE = "netscan-v1";
+const FICHIERS = ["./", "index.html", "styles.css", "app.js", "rendu.js", "icon.svg", "manifest.webmanifest"];
+
+self.addEventListener("install", (e) => {
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(FICHIERS)));
+  self.skipWaiting();
+});
+
+self.addEventListener("activate", (e) => {
+  e.waitUntil(
+    caches.keys().then((cles) => Promise.all(cles.filter((c) => c !== CACHE).map((c) => caches.delete(c))))
+  );
+  self.clients.claim();
+});
+
+self.addEventListener("fetch", (e) => {
+  const url = new URL(e.request.url);
+  if (e.request.method !== "GET" || url.pathname.startsWith("/api/")) return;
+  // Réseau d'abord, cache en secours (hors connexion).
+  e.respondWith(
+    fetch(e.request)
+      .then((rep) => {
+        const copie = rep.clone();
+        caches.open(CACHE).then((c) => c.put(e.request, copie));
+        return rep;
+      })
+      .catch(() => caches.match(e.request))
+  );
+});

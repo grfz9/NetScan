@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#1d2430"/>
+  <rect x="80" y="40" width="640" height="520" rx="8" fill="#11161f" stroke="#2d3646" stroke-width="4"/>
+  <!-- Routeur -->
+  <rect x="110" y="120" width="580" height="90" rx="6" fill="#3a4250"/>
+  <text x="135" y="160" fill="#e8edf5" font-family="Arial" font-size="22" font-weight="bold">CISCO</text>
+  <text x="135" y="185" fill="#9aa6b8" font-family="Arial" font-size="14">2911</text>
+  <g fill="#111"><rect x="420" y="150" width="34" height="28"/><rect x="470" y="150" width="34" height="28"/><rect x="520" y="150" width="34" height="28"/></g>
+  <rect x="600" y="150" width="34" height="28" fill="#3b82c4"/>
+  <!-- Switch -->
+  <rect x="110" y="290" width="580" height="90" rx="6" fill="#3a4250"/>
+  <text x="135" y="330" fill="#e8edf5" font-family="Arial" font-size="22" font-weight="bold">CISCO</text>
+  <text x="135" y="355" fill="#9aa6b8" font-family="Arial" font-size="14">Catalyst 2960</text>
+  <g fill="#111">
+    <rect x="300" y="310" width="22" height="18"/><rect x="326" y="310" width="22" height="18"/><rect x="352" y="310" width="22" height="18"/><rect x="378" y="310" width="22" height="18"/><rect x="404" y="310" width="22" height="18"/><rect x="430" y="310" width="22" height="18"/>
+    <rect x="300" y="336" width="22" height="18"/><rect x="326" y="336" width="22" height="18"/><rect x="352" y="336" width="22" height="18"/><rect x="378" y="336" width="22" height="18"/><rect x="404" y="336" width="22" height="18"/><rect x="430" y="336" width="22" height="18"/>
+    <rect x="600" y="320" width="26" height="22"/><rect x="636" y="320" width="26" height="22"/>
+  </g>
+  <!-- Câbles -->
+  <path d="M487 178 C 500 250, 620 250, 613 320" stroke="#2f7de1" stroke-width="7" fill="none"/>
+  <path d="M311 328 C 300 450, 200 480, 180 600" stroke="#2f7de1" stroke-width="7" fill="none"/>
+  <path d="M441 354 C 450 470, 520 500, 540 600" stroke="#2f7de1" stroke-width="7" fill="none"/>
+  <path d="M617 178 C 650 260, 760 300, 800 330" stroke="#7dd3fc" stroke-width="6" fill="none"/>
+  <!-- LED -->
+  <circle cx="311" cy="304" r="3" fill="#22c55e"/><circle cx="441" cy="304" r="3" fill="#22c55e"/><circle cx="613" cy="314" r="3" fill="#22c55e"/>
+</svg>

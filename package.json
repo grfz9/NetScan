@@ -1,0 +1,26 @@
+{
+  "name": "netscan",
+  "version": "1.0.0",
+  "description": "Prends en photo un équipement réseau : NetScan affiche le schéma, les ports, la configuration et ce qui manque pour que ça fonctionne.",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=20.12"
+  },
+  "keywords": [
+    "reseau",
+    "cisco",
+    "packet-tracer",
+    "vision",
+    "claude"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.131.0",
+    "express": "^5.2.1"
+  }
+}

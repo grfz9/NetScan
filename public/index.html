@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>NetScan</title>
+  <meta name="description" content="Prends en photo un équipement réseau : schéma, ports, configuration et diagnostic.">
+  <meta name="theme-color" content="#0b1220">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="barre">
+    <button class="logo" id="btn-accueil" type="button" aria-label="Retour à l'accueil">
+      <img src="icon.svg" alt="" width="28" height="28">
+      <span>NetScan</span>
+    </button>
+    <button class="btn-icone" id="btn-historique" type="button" aria-label="Historique">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 7v5l3 2M3 12a9 9 0 1 0 3-6.7M3 4v4h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </header>
+
+  <main>
+    <!-- Accueil : prise de photo -->
+    <section id="vue-accueil" class="vue">
+      <div class="intro">
+        <h1>Photographie ton réseau</h1>
+        <p>Switch, routeur, écran de config ou schéma de TP : NetScan te montre le schéma, les ports, la configuration et ce qui manque pour que ça marche.</p>
+      </div>
+
+      <div class="capture">
+        <label class="btn-photo" for="input-camera">
+          <svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+          <span>Prendre une photo</span>
+        </label>
+        <input id="input-camera" type="file" accept="image/*" capture="environment" hidden>
+        <label class="btn-secondaire" for="input-galerie">Importer depuis la galerie</label>
+        <input id="input-galerie" type="file" accept="image/*" multiple hidden>
+      </div>
+
+      <div id="miniatures" class="miniatures" hidden></div>
+      <p class="aide" id="aide-photos" hidden>Tu peux ajouter jusqu'à 4 photos (ex : la façade du switch + l'écran de config).</p>
+
+      <label class="champ" for="contexte">
+        <span>Consigne ou contexte <em>(facultatif)</em></span>
+        <textarea id="contexte" rows="3" maxlength="2000" placeholder="Ex : TP2 — PC1 (VLAN 10) doit pinger PC2 (VLAN 20) à travers le routeur."></textarea>
+      </label>
+
+      <button id="btn-analyser" class="btn-principal" type="button" disabled>Analyser</button>
+      <button id="btn-demo" class="lien" type="button">Voir un exemple sans clé API</button>
+      <p id="statut-api" class="aide"></p>
+    </section>
+
+    <!-- Analyse en cours -->
+    <section id="vue-chargement" class="vue" hidden>
+      <div class="scan">
+        <img id="scan-image" alt="Photo en cours d'analyse">
+        <div class="scan-ligne"></div>
+      </div>
+      <ol class="progression" id="progression">
+        <li data-etape="envoi">Envoi de la photo</li>
+        <li data-etape="reflexion">Observation de l'image</li>
+        <li data-etape="equipements">Identification des équipements et des ports</li>
+        <li data-etape="schema">Tracé du schéma réseau</li>
+        <li data-etape="configuration">Lecture / écriture de la configuration</li>
+        <li data-etape="diagnostic">Diagnostic : est-ce que ça fonctionne ?</li>
+        <li data-etape="etapes">Rédaction des explications</li>
+      </ol>
+    </section>
+
+    <!-- Résultat -->
+    <section id="vue-resultat" class="vue" hidden>
+      <div id="verdict" class="verdict"></div>
+      <nav class="onglets" role="tablist">
+        <button role="tab" data-onglet="schema" aria-selected="true">Schéma</button>
+        <button role="tab" data-onglet="config" aria-selected="false">Config</button>
+        <button role="tab" data-onglet="diagnostic" aria-selected="false">Diagnostic</button>
+        <button role="tab" data-onglet="etapes" aria-selected="false">Étapes</button>
+      </nav>
+      <div class="panneau" id="onglet-schema" role="tabpanel"></div>
+      <div class="panneau" id="onglet-config" role="tabpanel" hidden></div>
+      <div class="panneau" id="onglet-diagnostic" role="tabpanel" hidden></div>
+      <div class="panneau" id="onglet-etapes" role="tabpanel" hidden></div>
+      <button id="btn-nouvelle" class="btn-principal" type="button">Nouvelle photo</button>
+    </section>
+
+    <!-- Historique -->
+    <section id="vue-historique" class="vue" hidden>
+      <h2>Historique</h2>
+      <div id="liste-historique"></div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" hidden></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
