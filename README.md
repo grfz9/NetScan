@@ -24,6 +24,19 @@ La clé est enregistrée uniquement dans ton navigateur, sur ton appareil, et n'
 
 Sans clé, le bouton **« Voir un exemple sans clé API »** montre une analyse complète de démonstration.
 
+## Clé partagée avec un code d'accès
+
+Le relais `relais/` (Cloudflare Worker) garde une clé API secrète et la prête aux personnes qui ont le **code d'accès** : dans l'appli, *Réglages → Code d'accès NetScan*. La clé n'est jamais dans le code ni sur GitHub, chaque appareil est limité à 5 demandes par minute.
+
+Mettre à jour les secrets (à taper soi-même) :
+
+```bash
+npx wrangler secret put ANTHROPIC_API_KEY --config relais/wrangler.toml
+npx wrangler secret put CODE_ACCES --config relais/wrangler.toml
+```
+
+Redéployer après une modification : `npm run relais:deploy`. Changer `CODE_ACCES` coupe l'accès à tous ceux qui ont l'ancien code.
+
 ## Version sans clé API, sur claude.ai
 
 NetScan existe aussi en page claude.ai : l'analyse passe alors par **ton compte Claude** (ton abonnement), sans clé API ni crédit. Elle ne fonctionne que pour les personnes connectées à claude.ai avec qui la page est partagée.
@@ -97,6 +110,8 @@ config, diagnostic, étapes  ◀─résultat───┘
 |---|---|
 | `server.js` | Serveur Express : sert l'interface et l'API `/api/analyse` |
 | `public/coeur.js` | Consigne envoyée à Claude, appel à l'API en streaming, et version claude.ai sans clé (partagé partout) |
+| `relais/worker.js` | Relais Cloudflare : clé API partagée derrière un code d'accès |
+| `public/config.js` | Adresse du relais |
 | `scripts/build-artifact.mjs` | Fabrique la page claude.ai à partir de `public/index.html` |
 | `public/schema.js` | Schéma JSON que la réponse doit respecter (équipements, ports, liens, config, diagnostic, étapes) |
 | `src/analyse.js` | Branche le cœur de l'analyse sur la clé du serveur |
