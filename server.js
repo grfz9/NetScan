@@ -29,7 +29,7 @@ app.get("/api/statut", (req, res) => {
 
 // Réponse en NDJSON : une ligne JSON par événement ({etape}, puis {resultat} ou {erreur}).
 app.post("/api/analyse", async (req, res) => {
-  const { images, contexte = "" } = req.body ?? {};
+  const { images, contexte = "", materiel = [] } = req.body ?? {};
 
   if (!Array.isArray(images) || images.length === 0 || images.length > MAX_PHOTOS) {
     return res.status(400).json({ erreur: `Envoie entre 1 et ${MAX_PHOTOS} photos.` });
@@ -50,6 +50,7 @@ app.post("/api/analyse", async (req, res) => {
     const { resultat, modele: utilise, usage } = await analyser({
       images,
       contexte: String(contexte).slice(0, 2000),
+      materiel,
       onEtape: (etape) => envoyer({ etape }),
     });
     console.log(

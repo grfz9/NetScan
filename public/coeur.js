@@ -40,10 +40,26 @@ const ETAPES_JSON = [
 
 export class ErreurAnalyse extends Error {}
 
-const texteContexte = (contexte) =>
-  contexte
+// materiel = [{ nom, quantite }] : l'équipement que l'étudiant a sous la main.
+function texteContexte(contexte, materiel = []) {
+  let texte = contexte
     ? `Consigne / contexte donné par l'étudiant :\n${contexte}`
     : "Pas de consigne particulière : analyse ce que tu vois.";
+  if (materiel.length) {
+    texte += `\n\nMatériel dont l'étudiant dispose (en plus de ce qui est sur les photos) :\n${materiel
+      .map((m) => `- ${m.quantite} × ${m.nom}`)
+      .join("\n")}
+Propose un schéma et une configuration réalisables avec ce matériel (nombre et type d'interfaces, modules, câbles). Si quelque chose manque pour que ça fonctionne, liste-le dans materiel_a_prevoir avec la raison, et propose une alternative avec le matériel disponible quand c'est possible.`;
+  }
+  return texte;
+}
+
+export function nettoyerMateriel(liste) {
+  return (Array.isArray(liste) ? liste : [])
+    .filter((m) => m && typeof m.nom === "string" && m.nom.trim())
+    .slice(0, 50)
+    .map((m) => ({ nom: m.nom.trim().slice(0, 80), quantite: Math.max(1, Math.min(99, Number(m.quantite) || 1)) }));
+}
 
 function suivreProgression(onEtape) {
   let prochaine = 0;
@@ -57,13 +73,13 @@ function suivreProgression(onEtape) {
 
 export async function analyserAvec(
   client,
-  { images, contexte, modele = MODELE_PAR_DEFAUT, effort = EFFORT_PAR_DEFAUT, onEtape = () => {} }
+  { images, contexte, materiel, modele = MODELE_PAR_DEFAUT, effort = EFFORT_PAR_DEFAUT, onEtape = () => {} }
 ) {
   const contenu = images.map((img) => ({
     type: "image",
     source: { type: "base64", media_type: img.media_type, data: img.data },
   }));
-  contenu.push({ type: "text", text: texteContexte(contexte) });
+  contenu.push({ type: "text", text: texteContexte(contexte, nettoyerMateriel(materiel)) });
 
   const stream = client.beta.messages.stream({
     model: modele,
@@ -143,10 +159,10 @@ export function messageErreur(err, Anthropic) {
 
 // `sample` = claude.use("sample") dans une page publiée sur claude.ai. Ici le format JSON
 // n'est pas imposé par l'API : on donne le schéma dans la consigne et on vérifie la réponse.
-export async function analyserAvecCompteClaude(sample, { images, contexte, onEtape = () => {} }) {
+export async function analyserAvecCompteClaude(sample, { images, contexte, materiel, onEtape = () => {} }) {
   const consigne = `${SYSTEME}
 
-${texteContexte(contexte)}
+${texteContexte(contexte, nettoyerMateriel(materiel))}
 
 ${images.length} photo${images.length > 1 ? "s sont jointes" : " est jointe"}.
 Réponds uniquement avec un objet JSON, sans aucun texte autour, qui respecte exactement ce schéma JSON (toutes les propriétés sont obligatoires) :
@@ -211,6 +227,7 @@ export function normaliser(r) {
       verifications: liste(diagnostic.verifications),
     },
     etapes: liste(r.etapes),
+    materiel_a_prevoir: liste(r.materiel_a_prevoir).filter((m) => m && texte(m.element)),
     limites: texte(r.limites),
   };
 }

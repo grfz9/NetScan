@@ -52,6 +52,25 @@
         <textarea id="contexte" rows="3" maxlength="2000" placeholder="Ex : TP2 — PC1 (VLAN 10) doit pinger PC2 (VLAN 20) à travers le routeur."></textarea>
       </label>
 
+      <details class="carte materiel" id="bloc-materiel">
+        <summary><span>Mon matériel disponible</span> <span class="chip" id="compte-materiel">vide</span></summary>
+        <p class="muted">Indique l'équipement que tu as sous la main : NetScan proposera un schéma et une config réalisables avec, et te dira ce qui manque.</p>
+        <ul class="liste-materiel" id="liste-materiel"></ul>
+        <div class="ajout-materiel">
+          <label class="visuellement-cache" for="nom-materiel">Équipement</label>
+          <input id="nom-materiel" type="text" maxlength="80" placeholder="Ex : Routeur Cisco 1841" list="suggestions-materiel">
+          <label class="visuellement-cache" for="quantite-materiel">Quantité</label>
+          <input id="quantite-materiel" type="number" min="1" max="99" value="1" inputmode="numeric">
+          <button id="btn-ajouter-materiel" class="btn-mini" type="button">Ajouter</button>
+        </div>
+        <datalist id="suggestions-materiel"></datalist>
+        <div class="raccourcis" id="raccourcis-materiel"></div>
+        <label class="case">
+          <input type="checkbox" id="utiliser-materiel" checked>
+          <span>En tenir compte dans l'analyse</span>
+        </label>
+      </details>
+
       <button id="btn-analyser" class="btn-principal" type="button" disabled>Analyser</button>
       <button id="btn-demo" class="lien" type="button">Voir un exemple sans clé API</button>
       <p id="statut-api" class="aide"></p>
