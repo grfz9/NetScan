@@ -17,6 +17,9 @@
       <span>NetScan</span>
     </button>
     <div class="barre-actions">
+      <button class="btn-icone" id="btn-calcul" type="button" aria-label="Calcul IP et sous-réseaux">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 7h8M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+      </button>
       <button class="btn-icone" id="btn-historique" type="button" aria-label="Historique">
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 7v5l3 2M3 12a9 9 0 1 0 3-6.7M3 4v4h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
@@ -125,6 +128,45 @@
       <div class="panneau" id="onglet-diagnostic" role="tabpanel" hidden></div>
       <div class="panneau" id="onglet-etapes" role="tabpanel" hidden></div>
       <button id="btn-nouvelle" class="btn-principal" type="button">Nouvelle photo</button>
+    </section>
+
+    <!-- Calcul IP et VLSM (hors ligne, sans Claude) -->
+    <section id="vue-calcul" class="vue" hidden>
+      <h2>Calcul IP</h2>
+      <div class="bascule-schema" role="group" aria-label="Outil">
+        <button type="button" data-outil="adresse" aria-pressed="true">Adresse et masque</button>
+        <button type="button" data-outil="vlsm" aria-pressed="false">Découpage VLSM</button>
+      </div>
+
+      <div id="outil-adresse">
+        <div class="carte">
+          <div class="champs-calcul">
+            <label class="champ" for="calcul-ip">
+              <span>Adresse IP</span>
+              <input id="calcul-ip" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" value="192.168.1.10/26" placeholder="192.168.1.10 ou 192.168.1.10/26">
+            </label>
+            <label class="champ" for="calcul-masque">
+              <span>Masque <em>(si pas de /…)</em></span>
+              <input id="calcul-masque" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="/24 ou 255.255.255.0">
+            </label>
+          </div>
+        </div>
+        <div id="resultat-adresse"></div>
+      </div>
+
+      <div id="outil-vlsm" hidden>
+        <div class="carte">
+          <label class="champ" for="vlsm-reseau">
+            <span>Réseau à découper</span>
+            <input id="vlsm-reseau" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" value="192.168.10.0/24" placeholder="192.168.10.0/24">
+          </label>
+          <p class="champ-titre">Sous-réseaux et nombre d'hôtes nécessaires</p>
+          <div id="liste-besoins"></div>
+          <button id="btn-ajouter-besoin" class="btn-mini" type="button">+ Ajouter un sous-réseau</button>
+          <p class="muted petit">Un lien entre deux routeurs : mets 2 hôtes (il recevra un /30).</p>
+        </div>
+        <div id="resultat-vlsm"></div>
+      </div>
     </section>
 
     <!-- Réglages -->
