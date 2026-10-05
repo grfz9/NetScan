@@ -20,6 +20,7 @@ import {
   messageErreurCompteClaude,
 } from "./coeur.js";
 import { URL_RELAIS } from "./config.js";
+import { initialiserCalcul } from "./ecran-calcul.js";
 
 const $ = (sel) => document.querySelector(sel);
 const CLE_HISTORIQUE = "netscan.historique";
@@ -95,7 +96,7 @@ function modeAnalyse() {
 /* ---------- Navigation entre les vues ---------- */
 
 function afficherVue(nom) {
-  for (const v of ["accueil", "chargement", "resultat", "historique", "reglages"]) {
+  for (const v of ["accueil", "chargement", "resultat", "historique", "reglages", "calcul"]) {
     $(`#vue-${v}`).hidden = v !== nom;
   }
   window.scrollTo({ top: 0 });
@@ -808,6 +809,8 @@ $("#fichier-config").addEventListener("change", async (e) => {
 $("#btn-demo").addEventListener("click", lancerDemo);
 $("#btn-accueil").addEventListener("click", () => afficherVue("accueil"));
 $("#btn-historique").addEventListener("click", afficherHistorique);
+$("#btn-calcul").addEventListener("click", () => afficherVue("calcul"));
+initialiserCalcul();
 $("#btn-nouvelle").addEventListener("click", () => {
   etat.photos = [];
   $("#contexte").value = "";

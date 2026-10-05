@@ -302,6 +302,41 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .visuellement-cache { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .a-prevoir li { margin-bottom: 8px; }
 
+/* Calcul IP */
+.champs-calcul { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0 12px; }
+.champs-calcul .champ, #outil-vlsm .champ { margin: 0 0 8px; }
+.champ input {
+  width: 100%;
+  padding: 11px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--bord);
+  background: var(--carte);
+  color: var(--texte);
+  font: 500 1rem ui-monospace, Consolas, monospace;
+}
+.champ-titre { font-weight: 600; margin: 12px 0 6px; }
+.table-calcul th { width: 48%; font-weight: 500; }
+.table-calcul code, .table-vlsm code { font: 600 0.9em ui-monospace, Consolas, monospace; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.table-vlsm td, .table-vlsm th { white-space: nowrap; }
+.binaire { margin: 0; font: 13px/1.7 ui-monospace, Consolas, monospace; white-space: pre; }
+.bit-reseau { color: var(--accent); font-weight: 700; }
+.bit-hote { color: var(--warn); }
+.binaire .point { color: var(--texte-2); }
+.legende-bits { font-size: 0.85rem; color: var(--texte-2); display: flex; gap: 14px; flex-wrap: wrap; margin: 8px 0 0; }
+.calcul-etapes .etape { padding-bottom: 14px; }
+.erreur-calcul { border-left: 4px solid var(--ko); color: var(--texte); }
+.besoin { display: grid; grid-template-columns: 1fr 90px 36px; gap: 8px; margin-bottom: 8px; align-items: center; }
+.besoin input {
+  min-width: 0;
+  padding: 9px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--bord);
+  background: var(--carte);
+  color: var(--texte);
+  font: inherit;
+}
+.besoin .btn-icone { width: 36px; height: 36px; font-size: 18px; }
+
 /* Chargement */
 .scan {
   position: relative;
