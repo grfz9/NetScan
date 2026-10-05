@@ -101,6 +101,12 @@ function afficherVue(nom) {
   for (const v of ["accueil", "chargement", "resultat", "historique", "reglages", "calcul"]) {
     $(`#vue-${v}`).hidden = v !== nom;
   }
+  // La navigation indique où l'on est (un résultat ou une analyse en cours restent sous « Analyser »).
+  const onglet = ["historique", "reglages", "calcul"].includes(nom) ? nom : "accueil";
+  document.querySelectorAll(".navigation [data-nav]").forEach((b) => {
+    if (b.dataset.nav === onglet) b.setAttribute("aria-current", "page");
+    else b.removeAttribute("aria-current");
+  });
   window.scrollTo({ top: 0 });
 }
 
@@ -220,6 +226,7 @@ function afficherMiniatures() {
   $("#aide-photos").hidden = etat.photos.length === 0;
   majBoutonAnalyser();
   $(".btn-photo span").textContent = etat.photos.length ? "Ajouter une photo" : "Prendre une photo";
+  majBoutonAnalyser();
 }
 
 /* ---------- Analyse ---------- */
@@ -238,8 +245,12 @@ function marquerEtape(nom) {
 
 // On peut analyser des photos, ou seulement une description écrite de l'installation.
 function majBoutonAnalyser() {
-  $("#btn-analyser").disabled =
-    etat.photos.length === 0 && !$("#contexte").value.trim() && !$("#config-texte").value.trim();
+  const vide = etat.photos.length === 0 && !$("#contexte").value.trim() && !$("#config-texte").value.trim();
+  $("#btn-analyser").disabled = vide;
+  const n = etat.photos.length;
+  $("#btn-analyser").textContent = n ? `Analyser ${n > 1 ? `les ${n} photos` : "la photo"}` : "Analyser";
+  $("#indice-analyser").hidden = !vide;
+  $(".zone-analyser").classList.toggle("prete", !vide);
 }
 
 function majTailleConfig() {
@@ -810,7 +821,25 @@ $("#fichier-config").addEventListener("change", async (e) => {
   majTailleConfig();
 });
 $("#btn-demo").addEventListener("click", lancerDemo);
+$("#btn-demo-hero").addEventListener("click", lancerDemo);
 $("#btn-accueil").addEventListener("click", () => afficherVue("accueil"));
+$("#btn-nav-accueil").addEventListener("click", () => afficherVue(etat.resultat && !$("#vue-resultat").hidden ? "resultat" : "accueil"));
+
+// Petit schéma d'aperçu sur l'accueil (même dessin qu'un vrai résultat).
+$("#apercu-schema").innerHTML = dessinerTopologie({
+  equipements: [
+    { id: "R1", nom: "Routeur", type: "routeur", modele: "ISR 2911", ports: [] },
+    { id: "SW1", nom: "Switch", type: "switch", modele: "Catalyst 2960", ports: [] },
+    { id: "PC1", nom: "PC", type: "pc", modele: "VLAN 10", ports: [] },
+    { id: "PC2", nom: "PC", type: "pc", modele: "VLAN 20", ports: [] },
+  ],
+  liens: [
+    { de: "R1", port_de: "Gi0/1", vers: "SW1", port_vers: "Gi0/1", cable: "droit", certitude: "observe" },
+    { de: "SW1", port_de: "Fa0/1", vers: "PC1", port_vers: "", cable: "droit", certitude: "observe" },
+    { de: "SW1", port_de: "Fa0/11", vers: "PC2", port_vers: "", cable: "droit", certitude: "observe" },
+  ],
+  diagnostic: { problemes: [{ gravite: "bloquant", concerne: ["R1", "SW1"] }] },
+});
 $("#btn-historique").addEventListener("click", afficherHistorique);
 $("#btn-calcul").addEventListener("click", () => afficherVue("calcul"));
 
