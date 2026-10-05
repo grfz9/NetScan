@@ -12,83 +12,110 @@
 </head>
 <body>
   <header class="barre">
-    <button class="logo" id="btn-accueil" type="button" aria-label="Retour à l'accueil">
+    <button class="logo" id="btn-accueil" type="button" aria-label="NetScan, retour à l'accueil">
       <img src="icon.svg" alt="" width="28" height="28">
       <span>NetScan</span>
     </button>
-    <div class="barre-actions">
-      <button class="btn-icone" id="btn-calcul" type="button" aria-label="Calcul IP et sous-réseaux">
-        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 7h8M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
-      </button>
-      <button class="btn-icone" id="btn-historique" type="button" aria-label="Historique">
-        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 7v5l3 2M3 12a9 9 0 1 0 3-6.7M3 4v4h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-      <button class="btn-icone" id="btn-reglages" type="button" aria-label="Réglages">
-        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1L7 17M17 7l2.1-2.1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      </button>
-    </div>
+    <nav class="navigation" aria-label="Navigation principale">
+      <button type="button" data-nav="accueil" id="btn-nav-accueil" aria-current="page"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.5" fill="none" stroke="currentColor" stroke-width="2"/></svg><span>Analyser</span></button>
+      <button type="button" data-nav="calcul" id="btn-calcul"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 7h8M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg><span>Calcul IP</span></button>
+      <button type="button" data-nav="historique" id="btn-historique"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 7v5l3 2M3 12a9 9 0 1 0 3-6.7M3 4v4h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Historique</span></button>
+      <button type="button" data-nav="reglages" id="btn-reglages"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Compte</span></button>
+    </nav>
   </header>
 
   <main>
-    <!-- Accueil : prise de photo -->
+    <!-- Accueil -->
     <section id="vue-accueil" class="vue">
-      <div class="intro">
-        <h1>Photographie ton réseau</h1>
-        <p>Switch, routeur, écran de config ou schéma de TP : NetScan te montre le schéma, les ports, la configuration et ce qui manque pour que ça marche.</p>
+      <div class="hero">
+        <p class="surtitre">Le Photomath du réseau</p>
+        <h1>Photographie ton matériel réseau, NetScan t'explique tout.</h1>
+        <p class="hero-texte">Switch, routeur, baie de TP ou écran de config : tu obtiens le schéma avec les ports, la configuration, ce qui ne marche pas et comment le corriger, étape par étape.</p>
+        <button type="button" class="lien-exemple" id="btn-demo-hero">Pas sûr ? Voir un exemple d'analyse →</button>
       </div>
 
-      <div class="capture">
-        <label class="btn-photo" for="input-camera">
-          <svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
-          <span>Prendre une photo</span>
-        </label>
+      <section class="etape-form" aria-labelledby="titre-etape-1">
+        <h2 id="titre-etape-1"><span class="num">1</span>Ce que tu veux analyser</h2>
+        <div class="choix-source">
+          <label class="tuile tuile-principale btn-photo" for="input-camera">
+            <svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            <span>Prendre une photo</span>
+            <small>Switch, routeur, baie, écran…</small>
+          </label>
+          <label class="tuile" for="input-galerie">
+            <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="9" cy="10" r="1.6" fill="currentColor"/><path d="M4 18l5-5 4 4 3-3 4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            <span>Importer des photos</span>
+            <small>Jusqu'à 10 photos</small>
+          </label>
+        </div>
         <input id="input-camera" type="file" accept="image/*" capture="environment" hidden>
-        <label class="btn-secondaire" for="input-galerie">Importer depuis la galerie</label>
         <input id="input-galerie" type="file" accept="image/*" multiple hidden>
+
+        <div id="miniatures" class="miniatures" hidden></div>
+        <p class="aide" id="aide-photos" hidden>Tu peux ajouter jusqu'à 10 photos : la façade de chaque équipement, l'arrière, l'écran de config, le schéma du TP…</p>
+
+        <details class="carte bloc-config-texte" id="bloc-config-texte">
+          <summary><span class="resume-option"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 6l5 6-5 6M12 18h8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Ou colle une configuration</span> <span class="chip" id="taille-config">vide</span></summary>
+          <p class="muted">Colle la sortie de <code>show running-config</code>, <code>show ip interface brief</code>, <code>show vlan brief</code>, <code>ipconfig</code>… C'est plus fiable qu'une photo d'écran, et ça suffit sans photo. Pour plusieurs équipements, colle-les à la suite (le nom de l'invite, comme <code>R1#</code>, aide à les distinguer).</p>
+          <label class="visuellement-cache" for="config-texte">Configuration collée</label>
+          <textarea id="config-texte" rows="8" wrap="off" spellcheck="false" autocapitalize="off" placeholder="R1#show running-config&#10;hostname R1&#10;interface GigabitEthernet0/0&#10; ip address 192.168.1.1 255.255.255.0&#10;..."></textarea>
+          <div class="actions-ligne">
+            <label class="btn-secondaire" for="fichier-config">Importer un fichier .txt</label>
+            <input id="fichier-config" type="file" accept=".txt,.cfg,.conf,.log,text/plain" hidden>
+            <button id="btn-vider-config" class="btn-secondaire" type="button">Vider</button>
+          </div>
+        </details>
+      </section>
+
+      <section class="etape-form" aria-labelledby="titre-etape-2">
+        <h2 id="titre-etape-2"><span class="num">2</span>Précise ton TP <em>(facultatif)</em></h2>
+        <label class="champ" for="contexte">
+          <span>Consigne ou objectif</span>
+          <textarea id="contexte" rows="3" maxlength="2000" placeholder="Ex : PC1 (VLAN 10) doit pinger PC2 (VLAN 20) à travers le routeur. Sans photo, décris ici ton installation."></textarea>
+        </label>
+
+        <details class="carte materiel" id="bloc-materiel">
+          <summary><span>Mon matériel disponible</span> <span class="chip" id="compte-materiel">vide</span></summary>
+          <p class="muted">Indique l'équipement que tu as sous la main : NetScan proposera un schéma et une config réalisables avec, et te dira ce qui manque.</p>
+          <ul class="liste-materiel" id="liste-materiel"></ul>
+          <div class="ajout-materiel">
+            <label class="visuellement-cache" for="nom-materiel">Équipement</label>
+            <input id="nom-materiel" type="text" maxlength="80" placeholder="Ex : Routeur Cisco 1841" list="suggestions-materiel">
+            <label class="visuellement-cache" for="quantite-materiel">Quantité</label>
+            <input id="quantite-materiel" type="number" min="1" max="99" value="1" inputmode="numeric">
+            <button id="btn-ajouter-materiel" class="btn-mini" type="button">Ajouter</button>
+          </div>
+          <datalist id="suggestions-materiel"></datalist>
+          <div class="raccourcis" id="raccourcis-materiel"></div>
+          <label class="case">
+            <input type="checkbox" id="utiliser-materiel" checked>
+            <span>En tenir compte dans l'analyse</span>
+          </label>
+        </details>
+      </section>
+
+      <div class="zone-analyser">
+        <button id="btn-analyser" class="btn-principal btn-analyser" type="button" disabled>Analyser</button>
+        <p class="indice" id="indice-analyser">Ajoute une photo ou colle une configuration pour commencer.</p>
+        <p id="statut-api" class="aide"></p>
       </div>
 
-      <div id="miniatures" class="miniatures" hidden></div>
-      <p class="aide" id="aide-photos" hidden>Tu peux ajouter jusqu'à 10 photos : la façade de chaque équipement, l'arrière, l'écran de config, le schéma du TP…</p>
-
-      <details class="carte bloc-config-texte" id="bloc-config-texte">
-        <summary><span>Coller une configuration</span> <span class="chip" id="taille-config">vide</span></summary>
-        <p class="muted">Colle la sortie de <code>show running-config</code>, <code>show ip interface brief</code>, <code>show vlan brief</code>, <code>ipconfig</code>… C'est plus fiable qu'une photo d'écran, et ça suffit sans photo. Pour plusieurs équipements, colle-les à la suite (le nom de l'invite, comme <code>R1#</code>, aide à les distinguer).</p>
-        <label class="visuellement-cache" for="config-texte">Configuration collée</label>
-        <textarea id="config-texte" rows="8" wrap="off" spellcheck="false" autocapitalize="off" placeholder="R1#show running-config&#10;hostname R1&#10;interface GigabitEthernet0/0&#10; ip address 192.168.1.1 255.255.255.0&#10;..."></textarea>
-        <div class="actions-ligne">
-          <label class="btn-secondaire" for="fichier-config">Importer un fichier .txt</label>
-          <input id="fichier-config" type="file" accept=".txt,.cfg,.conf,.log,text/plain" hidden>
-          <button id="btn-vider-config" class="btn-secondaire" type="button">Vider</button>
-        </div>
-      </details>
-
-      <label class="champ" for="contexte">
-        <span>Consigne ou contexte <em>(facultatif)</em></span>
-        <textarea id="contexte" rows="3" maxlength="2000" placeholder="Ex : TP2 — PC1 (VLAN 10) doit pinger PC2 (VLAN 20) à travers le routeur. Sans photo, décris ici ton installation : équipements, câbles, ports, config."></textarea>
-      </label>
-
-      <details class="carte materiel" id="bloc-materiel">
-        <summary><span>Mon matériel disponible</span> <span class="chip" id="compte-materiel">vide</span></summary>
-        <p class="muted">Indique l'équipement que tu as sous la main : NetScan proposera un schéma et une config réalisables avec, et te dira ce qui manque.</p>
-        <ul class="liste-materiel" id="liste-materiel"></ul>
-        <div class="ajout-materiel">
-          <label class="visuellement-cache" for="nom-materiel">Équipement</label>
-          <input id="nom-materiel" type="text" maxlength="80" placeholder="Ex : Routeur Cisco 1841" list="suggestions-materiel">
-          <label class="visuellement-cache" for="quantite-materiel">Quantité</label>
-          <input id="quantite-materiel" type="number" min="1" max="99" value="1" inputmode="numeric">
-          <button id="btn-ajouter-materiel" class="btn-mini" type="button">Ajouter</button>
-        </div>
-        <datalist id="suggestions-materiel"></datalist>
-        <div class="raccourcis" id="raccourcis-materiel"></div>
-        <label class="case">
-          <input type="checkbox" id="utiliser-materiel" checked>
-          <span>En tenir compte dans l'analyse</span>
-        </label>
-      </details>
-
-      <button id="btn-analyser" class="btn-principal" type="button" disabled>Analyser</button>
-      <button id="btn-demo" class="lien" type="button">Voir un exemple sans clé API</button>
-      <p id="statut-api" class="aide"></p>
+      <section class="comment" aria-labelledby="titre-comment">
+        <h2 id="titre-comment">Comment ça marche</h2>
+          <ol class="parcours">
+          <li><span class="parcours-num">1</span><span><strong>Prends une photo</strong> ou colle ta config</span></li>
+          <li><span class="parcours-num">2</span><span><strong>NetScan analyse</strong> en 30 s à 2 min</span></li>
+          <li><span class="parcours-num">3</span><span><strong>Tu reçois</strong> schéma, config et corrections</span></li>
+        </ol>
+        <button type="button" class="apercu" id="btn-demo" aria-label="Voir un exemple d'analyse">
+          <span class="apercu-tete">
+            <span class="apercu-pastille">✕</span>
+            <span><strong>Exemple : TP routage inter-VLAN</strong><span class="apercu-sous">Ça ne fonctionne pas : 3 problèmes trouvés</span></span>
+          </span>
+          <span class="apercu-schema" id="apercu-schema"></span>
+          <span class="apercu-action">Voir un exemple d'analyse →</span>
+        </button>
+      </section>
     </section>
 
     <!-- Analyse en cours -->

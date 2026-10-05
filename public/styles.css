@@ -145,26 +145,159 @@ button { font: inherit; color: inherit; cursor: pointer; }
 }
 
 /* Accueil */
-.intro { margin: 8px 0 20px; }
-.intro p { color: var(--texte-2); }
 
 .capture { display: grid; gap: 10px; margin-bottom: 16px; }
-.btn-photo {
+
+.btn-photo:active { transform: scale(0.99); }
+
+/* ---------- Navigation : en haut sur ordinateur, barre du bas sur téléphone ---------- */
+.navigation { display: flex; gap: 4px; }
+.navigation button {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 170px;
+  gap: 7px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--texte-2);
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+.navigation button:hover { background: var(--carte-2); color: var(--texte); }
+.navigation button[aria-current="page"] { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
+
+@media (max-width: 719px) {
+  /* Le flou de l'en-tête retiendrait la barre fixe : on le retire sur téléphone. */
+  .barre { backdrop-filter: none; background: var(--fond); }
+  .navigation {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 20;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
+    background: color-mix(in srgb, var(--fond) 92%, transparent);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--bord);
+  }
+  .navigation button { flex-direction: column; gap: 3px; padding: 6px 2px; font-size: 0.72rem; }
+  main { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+  .toast { bottom: calc(88px + env(safe-area-inset-bottom, 0px)); }
+}
+
+/* ---------- Accueil ---------- */
+.hero {
+  position: relative;
+  margin: 4px 0 20px;
+  padding: 20px 18px 18px;
   border-radius: 20px;
+  border: 1px solid var(--bord);
+  overflow: hidden;
+  /* Trame de points discrète, comme une grille de brassage. */
+  background:
+    radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--accent) 22%, transparent) 1px, transparent 0) 0 0 / 18px 18px,
+    linear-gradient(160deg, color-mix(in srgb, var(--accent) 12%, var(--carte)), var(--carte) 60%);
+}
+.surtitre { margin: 0 0 6px; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+.hero h1 { font-size: clamp(1.45rem, 4.6vw, 2rem); letter-spacing: -0.02em; text-wrap: balance; margin-bottom: 10px; }
+.hero-texte { color: var(--texte-2); max-width: 60ch; }
+.lien-exemple { background: none; border: 0; padding: 0; margin-top: 4px; color: var(--accent); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.hero-texte { margin-bottom: 10px; }
+.comment { margin: 34px 0 8px; }
+.comment > h2 { font-size: 1.1rem; }
+.parcours { list-style: none; padding: 0; margin: 12px 0 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px; }
+.parcours li { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; background: var(--carte); border: 1px solid var(--bord); font-size: 0.9rem; line-height: 1.3; }
+.parcours-num {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
   background: var(--accent);
   color: var(--accent-texte);
-  font-weight: 700;
-  font-size: 1.1rem;
-  cursor: pointer;
+  font-weight: 800;
+  font-size: 0.85rem;
+}
+
+/* Aperçu cliquable d'un vrai résultat (ouvre l'exemple). */
+.apercu {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--bord);
+  background: var(--carte);
   box-shadow: var(--ombre);
 }
-.btn-photo:active { transform: scale(0.99); }
+.apercu:hover { border-color: var(--accent); }
+.apercu-tete { display: flex; gap: 10px; align-items: center; }
+.apercu-pastille { flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--ko); color: #fff; font-weight: 800; }
+.apercu-sous { display: block; font-size: 0.82rem; color: var(--ko); font-weight: 600; }
+.apercu-schema { display: block; max-height: 190px; overflow: hidden; }
+.apercu-schema svg { display: block; margin: 0 auto; max-height: 190px; width: auto; max-width: 100%; }
+.apercu-action { color: var(--accent); font-weight: 700; }
+
+/* Étapes du formulaire */
+.etape-form { margin-bottom: 22px; }
+.etape-form > h2 { display: flex; align-items: center; gap: 10px; font-size: 1.1rem; margin-bottom: 12px; }
+.etape-form > h2 em { font-weight: 400; color: var(--texte-2); font-size: 0.9rem; }
+.num {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--texte);
+  color: var(--fond);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+.choix-source { display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px; margin-bottom: 10px; }
+.tuile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 4px;
+  min-height: 128px;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid var(--bord);
+  background: var(--carte);
+  cursor: pointer;
+  font-weight: 700;
+}
+.tuile small { font-weight: 500; color: var(--texte-2); font-size: 0.82rem; }
+.tuile svg { margin-bottom: auto; color: var(--accent); }
+.tuile-principale { background: var(--accent); border-color: var(--accent); color: var(--accent-texte); min-height: 128px; box-shadow: var(--ombre); }
+.tuile-principale svg, .tuile-principale small { color: var(--accent-texte); opacity: 0.95; }
+.tuile:hover { border-color: var(--accent); }
+.tuile:active { transform: scale(0.99); }
+.resume-option { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; }
+.resume-option svg { color: var(--accent); }
+
+.zone-analyser { padding: 12px; margin: 0 -12px; border-radius: 16px; }
+/* Dès qu'il y a quelque chose à analyser, le bouton reste visible en bas de l'écran. */
+.zone-analyser.prete { position: sticky; bottom: 12px; z-index: 4; background: color-mix(in srgb, var(--fond) 90%, transparent); backdrop-filter: blur(8px); }
+.btn-analyser { margin-top: 0; padding: 15px; font-size: 1.05rem; }
+.btn-analyser:not(:disabled) { background: var(--accent); color: var(--accent-texte); box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 35%, transparent); }
+.indice { text-align: center; font-size: 0.88rem; color: var(--texte-2); margin: 8px 0 0; }
+.zone-analyser .aide { margin-top: 4px; }
+
+@media (max-width: 719px) {
+  .zone-analyser.prete { bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
+}
+@media (max-width: 420px) {
+  .choix-source { grid-template-columns: 1fr 1fr; }
+  .tuile { min-height: 112px; padding: 14px; }
+}
 .btn-secondaire, .btn-principal {
   display: block;
   width: 100%;
