@@ -12,6 +12,12 @@ Tu peux envoyer **jusqu'à 10 photos** pour une même analyse (façades, arrièr
 
 L'analyse d'image est faite par l'API Claude (Anthropic), avec une réponse au format JSON imposé, ensuite dessinée par l'appli.
 
+## Outils inclus
+
+- **Coller une configuration** (`show running-config`, `show ip interface brief`…) au lieu de photographier l'écran : plus fiable, et suffisant sans photo.
+- **Calcul IP** (icône calculatrice) : réseau, masque, broadcast, plage, binaire et découpage **VLSM**, avec les étapes expliquées. Hors ligne, gratuit.
+- **Compte rendu de TP** : sur un résultat, « Exporter le compte rendu » en **PDF** (impression) ou **Word (.docx)**, avec schémas, ports, configuration, diagnostic et démarche.
+
 ## Utiliser l'appli en ligne
 
 👉 **https://grfz9.github.io/NetScan/**
