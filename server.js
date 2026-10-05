@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import express from "express";
 import Anthropic from "@anthropic-ai/sdk";
 import { analyser, modele } from "./src/analyse.js";
-import { MAX_PHOTOS, messageErreur } from "./public/coeur.js";
+import { MAX_PHOTOS, MAX_CONFIG, messageErreur } from "./public/coeur.js";
 
 try {
   process.loadEnvFile();
@@ -29,10 +29,13 @@ app.get("/api/statut", (req, res) => {
 
 // Réponse en NDJSON : une ligne JSON par événement ({etape}, puis {resultat} ou {erreur}).
 app.post("/api/analyse", async (req, res) => {
-  const { images, contexte = "", materiel = [] } = req.body ?? {};
+  const { images, contexte = "", materiel = [], configTexte = "" } = req.body ?? {};
 
-  if (!Array.isArray(images) || images.length === 0 || images.length > MAX_PHOTOS) {
-    return res.status(400).json({ erreur: `Envoie entre 1 et ${MAX_PHOTOS} photos.` });
+  if (!Array.isArray(images) || images.length > MAX_PHOTOS) {
+    return res.status(400).json({ erreur: `Envoie au maximum ${MAX_PHOTOS} photos.` });
+  }
+  if (!images.length && !String(contexte).trim() && !String(configTexte).trim()) {
+    return res.status(400).json({ erreur: "Ajoute une photo, une configuration ou une description." });
   }
   const invalide = images.some(
     (img) => !TYPES_IMAGE.includes(img?.media_type) || typeof img?.data !== "string" || !img.data
@@ -51,6 +54,7 @@ app.post("/api/analyse", async (req, res) => {
       images,
       contexte: String(contexte).slice(0, 2000),
       materiel,
+      configTexte: String(configTexte).slice(0, MAX_CONFIG),
       onEtape: (etape) => envoyer({ etape }),
     });
     console.log(

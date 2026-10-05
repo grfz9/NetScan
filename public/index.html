@@ -47,6 +47,18 @@
       <div id="miniatures" class="miniatures" hidden></div>
       <p class="aide" id="aide-photos" hidden>Tu peux ajouter jusqu'à 10 photos : la façade de chaque équipement, l'arrière, l'écran de config, le schéma du TP…</p>
 
+      <details class="carte bloc-config-texte" id="bloc-config-texte">
+        <summary><span>Coller une configuration</span> <span class="chip" id="taille-config">vide</span></summary>
+        <p class="muted">Colle la sortie de <code>show running-config</code>, <code>show ip interface brief</code>, <code>show vlan brief</code>, <code>ipconfig</code>… C'est plus fiable qu'une photo d'écran, et ça suffit sans photo. Pour plusieurs équipements, colle-les à la suite (le nom de l'invite, comme <code>R1#</code>, aide à les distinguer).</p>
+        <label class="visuellement-cache" for="config-texte">Configuration collée</label>
+        <textarea id="config-texte" rows="8" wrap="off" spellcheck="false" autocapitalize="off" placeholder="R1#show running-config&#10;hostname R1&#10;interface GigabitEthernet0/0&#10; ip address 192.168.1.1 255.255.255.0&#10;..."></textarea>
+        <div class="actions-ligne">
+          <label class="btn-secondaire" for="fichier-config">Importer un fichier .txt</label>
+          <input id="fichier-config" type="file" accept=".txt,.cfg,.conf,.log,text/plain" hidden>
+          <button id="btn-vider-config" class="btn-secondaire" type="button">Vider</button>
+        </div>
+      </details>
+
       <label class="champ" for="contexte">
         <span>Consigne ou contexte <em>(facultatif)</em></span>
         <textarea id="contexte" rows="3" maxlength="2000" placeholder="Ex : TP2 — PC1 (VLAN 10) doit pinger PC2 (VLAN 20) à travers le routeur. Sans photo, décris ici ton installation : équipements, câbles, ports, config."></textarea>

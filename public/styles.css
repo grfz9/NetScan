@@ -237,6 +237,23 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .case-cgv input { margin-top: 3px; }
 .case-cgv a { color: var(--accent); }
 
+/* Configuration collée */
+.bloc-config-texte { margin: 4px 0 8px; }
+.bloc-config-texte summary { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--texte); }
+.bloc-config-texte[open] summary { margin-bottom: 8px; }
+.bloc-config-texte code { font: 600 0.85em ui-monospace, Consolas, monospace; }
+.bloc-config-texte textarea {
+  width: 100%;
+  resize: vertical;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--bord);
+  background: var(--code-fond);
+  color: var(--code-texte);
+  font: 13px/1.5 ui-monospace, "Cascadia Code", Consolas, monospace;
+  margin-bottom: 8px;
+}
+
 /* Mon matériel */
 .materiel { margin: 4px 0 8px; }
 .materiel summary { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--texte); }

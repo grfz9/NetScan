@@ -4,6 +4,7 @@
 import { SCHEMA_ANALYSE } from "./schema.js";
 
 export const MAX_PHOTOS = 10;
+export const MAX_CONFIG = 40000; // caractères de configuration collée
 export const MODELE_PAR_DEFAUT = "claude-opus-5-5";
 export const EFFORT_PAR_DEFAUT = "medium";
 
@@ -55,11 +56,35 @@ Propose un schéma et une configuration réalisables avec ce matériel (nombre e
   return texte;
 }
 
-function textePhotos(n) {
+function textePhotos(n, avecConfig) {
   if (n === 0) {
-    return `Aucune photo n'est jointe : l'étudiant décrit son installation par écrit dans la consigne ci-dessus. Base-toi uniquement sur cette description, sans inventer ce qu'elle ne dit pas. Mets type_image à "schema_topologie", qualite_image.niveau à "bonne", et précise dans limites que l'analyse repose sur une description écrite.`;
+    return `Aucune photo n'est jointe : base-toi uniquement sur ${
+      avecConfig ? "la configuration collée et la consigne" : "la description écrite dans la consigne"
+    }, sans inventer ce qu'elles ne disent pas. Mets type_image à "${
+      avecConfig ? "ecran_configuration" : "schema_topologie"
+    }", qualite_image.niveau à "bonne", et précise dans limites que l'analyse repose sur du texte, sans photo du matériel.`;
   }
   return `${n} photo${n > 1 ? "s sont jointes" : " est jointe"}.`;
+}
+
+// Configuration collée (show running-config, show ip interface brief...) : c'est la source la plus
+// fiable, bien plus qu'une photo d'écran.
+function texteConfig(configTexte) {
+  const config = String(configTexte ?? "").trim().slice(0, MAX_CONFIG);
+  if (!config) return "";
+  return `Configuration ou sorties de commandes collées par l'étudiant (texte exact, entre les balises) :
+<config>
+${config}
+</config>
+C'est la source la plus fiable : retranscris-la sans rien inventer (source "lue" ou "mixte"), déduis-en les noms d'hôtes, interfaces, adresses, VLAN et états (up/down, shutdown), et préfère-la à ce que montrent les photos en cas de doute.`;
+}
+
+// Tout le texte envoyé avec les photos : consigne, matériel, configuration collée, nombre de photos.
+function texteEntree({ contexte, materiel, configTexte, nbPhotos }) {
+  const config = texteConfig(configTexte);
+  return [texteContexte(contexte, nettoyerMateriel(materiel)), config, textePhotos(nbPhotos, Boolean(config))]
+    .filter(Boolean)
+    .join("\n\n");
 }
 
 export function nettoyerMateriel(liste) {
@@ -100,13 +125,13 @@ export function extraireJSON(texte) {
 
 export async function analyserAvec(
   client,
-  { images, contexte, materiel, modele = MODELE_PAR_DEFAUT, effort = EFFORT_PAR_DEFAUT, onEtape = () => {} }
+  { images, contexte, materiel, configTexte, modele = MODELE_PAR_DEFAUT, effort = EFFORT_PAR_DEFAUT, onEtape = () => {} }
 ) {
   const contenu = images.map((img) => ({
     type: "image",
     source: { type: "base64", media_type: img.media_type, data: img.data },
   }));
-  contenu.push({ type: "text", text: `${texteContexte(contexte, nettoyerMateriel(materiel))}\n\n${textePhotos(images.length)}` });
+  contenu.push({ type: "text", text: texteEntree({ contexte, materiel, configTexte, nbPhotos: images.length }) });
 
   const stream = client.beta.messages.stream({
     model: modele,
@@ -181,12 +206,10 @@ export function messageErreur(err, Anthropic) {
 
 // `sample` = claude.use("sample") dans une page publiée sur claude.ai. Ici le format JSON
 // n'est pas imposé par l'API : on donne le schéma dans la consigne et on vérifie la réponse.
-export async function analyserAvecCompteClaude(sample, { images, contexte, materiel, onEtape = () => {} }) {
+export async function analyserAvecCompteClaude(sample, { images, contexte, materiel, configTexte, onEtape = () => {} }) {
   const consigne = `${SYSTEME}
 
-${texteContexte(contexte, nettoyerMateriel(materiel))}
-
-${textePhotos(images.length)}
+${texteEntree({ contexte, materiel, configTexte, nbPhotos: images.length })}
 
 ${CONSIGNE_FORMAT}`;
 

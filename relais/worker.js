@@ -5,7 +5,7 @@
 // Les secrets (ANTHROPIC_API_KEY, CODE_ACCES, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET) sont
 // définis avec `wrangler secret put` et ne sont jamais dans le code ni sur GitHub.
 import Anthropic from "@anthropic-ai/sdk";
-import { analyserAvec, messageErreur, MAX_PHOTOS, MODELE_PAR_DEFAUT, EFFORT_PAR_DEFAUT } from "../public/coeur.js";
+import { analyserAvec, messageErreur, MAX_PHOTOS, MAX_CONFIG, MODELE_PAR_DEFAUT, EFFORT_PAR_DEFAUT } from "../public/coeur.js";
 import { stripe, signatureValide, ErreurPaiement } from "./stripe.js";
 import {
   nouveauCode,
@@ -220,12 +220,14 @@ async function payeur(env, corps, appareil) {
 }
 
 async function analyser(request, env, ctx, corps, appareil, cors) {
-  const { images, contexte = "", materiel = [] } = corps;
+  const { images, contexte = "", materiel = [], configTexte = "" } = corps;
   if (!Array.isArray(images) || images.length > MAX_PHOTOS) throw new ErreurHttp(400, `Envoie au maximum ${MAX_PHOTOS} photos.`);
   if (images.some((img) => !TYPES_IMAGE.includes(img?.media_type) || typeof img?.data !== "string" || !img.data)) {
     throw new ErreurHttp(400, "Format d'image non pris en charge (JPEG, PNG, WebP ou GIF).");
   }
-  if (!images.length && !String(contexte).trim()) throw new ErreurHttp(400, "Ajoute une photo ou une description.");
+  if (!images.length && !String(contexte).trim() && !String(configTexte).trim()) {
+    throw new ErreurHttp(400, "Ajoute une photo, une configuration ou une description.");
+  }
   const qui = await payeur(env, corps, appareil);
 
   // Même format que le serveur Node : une ligne JSON par événement ({etape}, puis {resultat} ou {erreur}).
@@ -243,6 +245,7 @@ async function analyser(request, env, ctx, corps, appareil, cors) {
           images,
           contexte: String(contexte).slice(0, 2000),
           materiel,
+          configTexte: String(configTexte).slice(0, MAX_CONFIG),
           modele: qui.modele,
           effort: env.NETSCAN_EFFORT || EFFORT_PAR_DEFAUT,
           onEtape: (etape) => envoyer({ etape }),
