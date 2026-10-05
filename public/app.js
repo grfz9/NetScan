@@ -11,6 +11,7 @@ import {
 } from "./rendu.js";
 import {
   MAX_PHOTOS,
+  MAX_CONFIG,
   MODELE_PAR_DEFAUT,
   analyserAvec,
   messageErreur,
@@ -234,7 +235,14 @@ function marquerEtape(nom) {
 
 // On peut analyser des photos, ou seulement une description écrite de l'installation.
 function majBoutonAnalyser() {
-  $("#btn-analyser").disabled = etat.photos.length === 0 && !$("#contexte").value.trim();
+  $("#btn-analyser").disabled =
+    etat.photos.length === 0 && !$("#contexte").value.trim() && !$("#config-texte").value.trim();
+}
+
+function majTailleConfig() {
+  const n = $("#config-texte").value.trim().split("\n").filter((l) => l.trim()).length;
+  $("#taille-config").textContent = n ? `${n} ligne${n > 1 ? "s" : ""}` : "vide";
+  majBoutonAnalyser();
 }
 
 const TEXTE_SANS_PHOTO =
@@ -242,7 +250,8 @@ const TEXTE_SANS_PHOTO =
 
 async function lancerAnalyse() {
   const contexteSaisi = $("#contexte").value.trim();
-  if (!etat.photos.length && !contexteSaisi) return;
+  const configTexte = $("#config-texte").value.trim().slice(0, MAX_CONFIG);
+  if (!etat.photos.length && !contexteSaisi && !configTexte) return;
   if (SUR_CLAUDE_AI && !etat.compteClaude) {
     toast("Connexion à ton compte Claude…");
     await connexionClaude;
@@ -258,7 +267,7 @@ async function lancerAnalyse() {
   const materiel = $("#utiliser-materiel").checked ? lireMateriel() : [];
   let images = etat.photos.map(({ data, media_type }) => ({ data, media_type }));
   if (mode === "claude" && etat.compteClaude.sansPhotos && images.length) {
-    if (!contexte) {
+    if (!contexte && !configTexte) {
       $("#contexte").focus();
       return toast(TEXTE_SANS_PHOTO, true);
     }
@@ -276,7 +285,7 @@ async function lancerAnalyse() {
       claude: analyserViaCompteClaude,
       navigateur: analyserDansNavigateur,
     }[mode];
-    const resultat = await analyser({ images, contexte, materiel, onEtape: marquerEtape });
+    const resultat = await analyser({ images, contexte, materiel, configTexte, onEtape: marquerEtape });
     const vignette = images.length ? await miniatureDepuis(etat.photos[0].apercu).catch(() => "") : "";
     enregistrerHistorique({ resultat, contexte, vignette });
     afficherResultat(resultat);
@@ -289,22 +298,22 @@ async function lancerAnalyse() {
 const maxPhotos = () => etat.compteClaude?.maxPhotos ?? MAX_PHOTOS;
 
 // Mode claude.ai : les photos partent avec le compte Claude de la personne (aucune clé).
-async function analyserViaCompteClaude({ images, contexte, materiel, onEtape }) {
+async function analyserViaCompteClaude({ images, contexte, materiel, configTexte, onEtape }) {
   const fichiers = images.map(({ data, media_type }) => {
     const octets = Uint8Array.from(atob(data), (c) => c.charCodeAt(0));
     return new Blob([octets], { type: media_type });
   });
   try {
-    return await analyserAvecCompteClaude(etat.compteClaude.sample, { images: fichiers, contexte, materiel, onEtape });
+    return await analyserAvecCompteClaude(etat.compteClaude.sample, { images: fichiers, contexte, materiel, configTexte, onEtape });
   } catch (err) {
     // claude.ai refuse les photos dans cette vue : on retient l'info et on repart du texte si possible.
     if (err?.code === "images_unavailable") {
       etat.compteClaude.sansPhotos = true;
       majStatut();
-      if (contexte) {
-        toast("Les photos ne peuvent pas être envoyées ici : analyse à partir de ta description.");
+      if (contexte || configTexte) {
+        toast("Les photos ne peuvent pas être envoyées ici : analyse à partir de ton texte.");
         try {
-          return await analyserAvecCompteClaude(etat.compteClaude.sample, { images: [], contexte, materiel, onEtape });
+          return await analyserAvecCompteClaude(etat.compteClaude.sample, { images: [], contexte, materiel, configTexte, onEtape });
         } catch (err2) {
           throw new Error(messageErreurCompteClaude(err2));
         }
@@ -317,13 +326,13 @@ async function analyserViaCompteClaude({ images, contexte, materiel, onEtape }) 
 }
 
 // Mode serveur : le serveur Node appelle Claude et renvoie la progression en NDJSON.
-const analyserViaServeur = ({ images, contexte, materiel, onEtape }) =>
-  analyserEnFlux("api/analyse", { images, contexte, materiel }, onEtape);
+const analyserViaServeur = ({ images, contexte, materiel, configTexte, onEtape }) =>
+  analyserEnFlux("api/analyse", { images, contexte, materiel, configTexte }, onEtape);
 
 // Mode relais : même format, mais c'est le relais Cloudflare qui détient la clé.
-async function analyserViaRelais({ images, contexte, materiel, onEtape }) {
+async function analyserViaRelais({ images, contexte, materiel, configTexte, onEtape }) {
   try {
-    const corps = { images, contexte, materiel };
+    const corps = { images, contexte, materiel, configTexte };
     if (lire(CLE_CODE)) corps.code = lire(CLE_CODE);
     else if (lire(CLE_CREDIT)) corps.credit = lire(CLE_CREDIT);
     return await analyserEnFlux(`${URL_RELAIS}/analyse`, corps, onEtape);
@@ -379,7 +388,7 @@ async function analyserEnFlux(url, corpsRequete, onEtape) {
 
 // Mode navigateur (GitHub Pages) : l'appli appelle Claude directement avec la clé enregistrée ici.
 let Anthropic;
-async function analyserDansNavigateur({ images, contexte, materiel, onEtape }) {
+async function analyserDansNavigateur({ images, contexte, materiel, configTexte, onEtape }) {
   try {
     Anthropic ??= (await import(URL_SDK)).default;
   } catch {
@@ -387,7 +396,7 @@ async function analyserDansNavigateur({ images, contexte, materiel, onEtape }) {
   }
   const client = new Anthropic({ apiKey: lire(CLE_API), dangerouslyAllowBrowser: true });
   try {
-    const { resultat } = await analyserAvec(client, { images, contexte, materiel, onEtape, modele: modeleChoisi() });
+    const { resultat } = await analyserAvec(client, { images, contexte, materiel, configTexte, onEtape, modele: modeleChoisi() });
     return resultat;
   } catch (err) {
     throw new Error(messageErreur(err, Anthropic));
@@ -780,12 +789,30 @@ $("#miniatures").addEventListener("click", (e) => {
 
 $("#btn-analyser").addEventListener("click", lancerAnalyse);
 $("#contexte").addEventListener("input", majBoutonAnalyser);
+$("#config-texte").addEventListener("input", majTailleConfig);
+$("#btn-vider-config").addEventListener("click", () => {
+  $("#config-texte").value = "";
+  majTailleConfig();
+});
+$("#fichier-config").addEventListener("change", async (e) => {
+  const fichier = e.target.files[0];
+  e.target.value = "";
+  if (!fichier) return;
+  if (fichier.size > 2_000_000) return toast("Fichier trop gros : colle seulement la configuration utile.", true);
+  const texte = await fichier.text();
+  const zone = $("#config-texte");
+  zone.value = (zone.value.trim() ? `${zone.value.trim()}\n\n` : "") + texte.trim();
+  if (zone.value.length > MAX_CONFIG) toast(`Seuls les ${MAX_CONFIG.toLocaleString("fr-FR")} premiers caractères seront analysés.`);
+  majTailleConfig();
+});
 $("#btn-demo").addEventListener("click", lancerDemo);
 $("#btn-accueil").addEventListener("click", () => afficherVue("accueil"));
 $("#btn-historique").addEventListener("click", afficherHistorique);
 $("#btn-nouvelle").addEventListener("click", () => {
   etat.photos = [];
   $("#contexte").value = "";
+  $("#config-texte").value = "";
+  majTailleConfig();
   afficherMiniatures();
   afficherVue("accueil");
 });

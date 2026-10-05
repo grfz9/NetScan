@@ -7,7 +7,7 @@ const effort = () => process.env.NETSCAN_EFFORT || EFFORT_PAR_DEFAUT;
 
 let client;
 
-export function analyser({ images, contexte, materiel, onEtape }) {
+export function analyser({ images, contexte, materiel, configTexte, onEtape }) {
   client ??= new Anthropic();
-  return analyserAvec(client, { images, contexte, materiel, onEtape, modele: modele(), effort: effort() });
+  return analyserAvec(client, { images, contexte, materiel, configTexte, onEtape, modele: modele(), effort: effort() });
 }
