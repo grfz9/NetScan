@@ -1,82 +1,92 @@
+@import url("https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Semi+Condensed:wght@600;700&display=swap");
+
 :root {
-  --fond: #f4f6fa;
-  --carte: #ffffff;
-  --carte-2: #eef1f6;
-  --texte: #142033;
-  --texte-2: #55627a;
-  --bord: #d9dfe9;
-  --accent: #0e8f88;
+  --fond: #e4e8ec;
+  --carte: #fbfcfd;
+  --carte-2: #edf0f3;
+  --texte: #17202b;
+  --texte-2: #4f5b69;
+  --bord: #c9d0d8;
+  --accent: #1c5fc7;
   --accent-texte: #ffffff;
-  --ok: #1a8f4c;
-  --ok-fond: #e3f5ea;
-  --warn: #b26b00;
-  --warn-fond: #fff2dc;
-  --ko: #c4302b;
-  --ko-fond: #fde6e5;
-  --neutre: #5f6b80;
-  --neutre-fond: #e9edf3;
-  --code-fond: #0f1726;
-  --code-texte: #e3e9f3;
-  --chassis: #2a3344;
-  --port-libre: #5b6577;
-  --port-ok: #22c55e;
-  --lien: #3b4b63;
-  --propose: #d97706;
-  --rayon: 14px;
-  --ombre: 0 1px 2px rgb(16 24 40 / 6%), 0 4px 16px rgb(16 24 40 / 6%);
+  --ok: #1e8a45;
+  --ok-fond: #ddf1e3;
+  --warn: #a86200;
+  --warn-fond: #fbefd6;
+  --ko: #c2352e;
+  --ko-fond: #f9e2e0;
+  --neutre: #5c6774;
+  --neutre-fond: #e2e6ea;
+  --code-fond: #12161c;
+  --code-texte: #dde3ea;
+  --chassis: #2b3038;
+  --port-libre: #59626e;
+  --port-ok: #2bb24c;
+  --lien: #33404f;
+  --propose: #d27a00;
+  --etiquette: #f2cc3d;
+  --etiquette-texte: #1c1a10;
+  --rayon: 8px;
+  --ombre: 0 1px 0 rgb(23 32 43 / 6%);
+  --police: "Barlow", "Segoe UI", system-ui, sans-serif;
+  --police-titre: "Barlow Semi Condensed", "Barlow", "Segoe UI", system-ui, sans-serif;
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --fond: #0b1220;
-    --carte: #121b2d;
-    --carte-2: #1a2539;
-    --texte: #e6ebf4;
-    --texte-2: #9aa7bd;
-    --bord: #26324a;
-    --accent: #2dd4bf;
-    --accent-texte: #06201d;
-    --ok: #4ade80;
-    --ok-fond: #12301f;
-    --warn: #fbbf24;
-    --warn-fond: #33270c;
-    --ko: #f87171;
-    --ko-fond: #3a1515;
-    --neutre: #9aa7bd;
-    --neutre-fond: #1f2a3f;
-    --code-fond: #070c16;
-    --chassis: #1f2838;
-    --port-libre: #6b7689;
-    --lien: #8ea0bd;
-    --propose: #fbbf24;
+    --fond: #16191e;
+    --carte: #1e2329;
+    --carte-2: #262c33;
+    --texte: #e6eaee;
+    --texte-2: #9aa5b1;
+    --bord: #333b45;
+    --accent: #5c9bff;
+    --accent-texte: #0b1a33;
+    --ok: #4cc26e;
+    --ok-fond: #16301f;
+    --warn: #f0b43c;
+    --warn-fond: #33280f;
+    --ko: #f0716a;
+    --ko-fond: #3a1a18;
+    --neutre: #9aa5b1;
+    --neutre-fond: #252b32;
+    --code-fond: #0f1216;
+    --chassis: #262b32;
+    --port-libre: #69737f;
+    --lien: #93a1b1;
+    --propose: #f0b43c;
+    --etiquette: #e9c23a;
+    --etiquette-texte: #1c1a10;
     --ombre: none;
     color-scheme: dark;
   }
 }
 
 :root[data-theme="dark"] {
-  --fond: #0b1220;
-  --carte: #121b2d;
-  --carte-2: #1a2539;
-  --texte: #e6ebf4;
-  --texte-2: #9aa7bd;
-  --bord: #26324a;
-  --accent: #2dd4bf;
-  --accent-texte: #06201d;
-  --ok: #4ade80;
-  --ok-fond: #12301f;
-  --warn: #fbbf24;
-  --warn-fond: #33270c;
-  --ko: #f87171;
-  --ko-fond: #3a1515;
-  --neutre: #9aa7bd;
-  --neutre-fond: #1f2a3f;
-  --code-fond: #070c16;
-  --chassis: #1f2838;
-  --port-libre: #6b7689;
-  --lien: #8ea0bd;
-  --propose: #fbbf24;
+  --fond: #16191e;
+  --carte: #1e2329;
+  --carte-2: #262c33;
+  --texte: #e6eaee;
+  --texte-2: #9aa5b1;
+  --bord: #333b45;
+  --accent: #5c9bff;
+  --accent-texte: #0b1a33;
+  --ok: #4cc26e;
+  --ok-fond: #16301f;
+  --warn: #f0b43c;
+  --warn-fond: #33280f;
+  --ko: #f0716a;
+  --ko-fond: #3a1a18;
+  --neutre: #9aa5b1;
+  --neutre-fond: #252b32;
+  --code-fond: #0f1216;
+  --chassis: #262b32;
+  --port-libre: #69737f;
+  --lien: #93a1b1;
+  --propose: #f0b43c;
+  --etiquette: #e9c23a;
+  --etiquette-texte: #1c1a10;
   --ombre: none;
   color-scheme: dark;
 }
@@ -90,7 +100,7 @@ body {
   margin: 0;
   background: var(--fond);
   color: var(--texte);
-  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font: 16.5px/1.5 var(--police);
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -102,7 +112,7 @@ main {
 
 [hidden] { display: none !important; }
 
-h1, h2, h3 { line-height: 1.25; margin: 0 0 8px; }
+h1, h2, h3 { line-height: 1.2; margin: 0 0 8px; font-family: var(--police-titre); font-weight: 700; letter-spacing: -0.005em; }
 h1 { font-size: 1.6rem; }
 h2 { font-size: 1.2rem; }
 h3 { font-size: 1rem; }
@@ -190,22 +200,46 @@ button { font: inherit; color: inherit; cursor: pointer; }
 }
 
 /* ---------- Accueil ---------- */
-.hero {
-  position: relative;
-  margin: 4px 0 20px;
-  padding: 20px 18px 18px;
-  border-radius: 20px;
-  border: 1px solid var(--bord);
-  overflow: hidden;
-  /* Trame de points discrète, comme une grille de brassage. */
-  background:
-    radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--accent) 22%, transparent) 1px, transparent 0) 0 0 / 18px 18px,
-    linear-gradient(160deg, color-mix(in srgb, var(--accent) 12%, var(--carte)), var(--carte) 60%);
+.hero { margin: 6px 0 26px; }
+
+/* Façade de switch : les LED des ports s'allument une fois, au chargement. */
+.facade {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: fit-content;
+  max-width: 100%;
+  margin-bottom: 18px;
+  padding: 12px 12px 9px;
+  border-radius: 4px;
+  background: var(--chassis);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 6%), 0 1px 0 rgb(0 0 0 / 25%);
 }
-.surtitre { margin: 0 0 6px; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
-.hero h1 { font-size: clamp(1.45rem, 4.6vw, 2rem); letter-spacing: -0.02em; text-wrap: balance; margin-bottom: 10px; }
+/* Oreilles de fixation vissées, comme sur un équipement de baie. */
+.facade::before, .facade::after {
+  content: "";
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #8a929c 0 1.5px, #5a626c 2px 100%);
+}
+.facade-ports { display: grid; grid-template-columns: repeat(8, 22px); gap: 5px; }
+.rj { position: relative; display: block; width: 22px; height: 17px; border-radius: 2px; background: #0e1014; box-shadow: inset 0 0 0 1px #3a414b; }
+.rj::after { content: ""; position: absolute; left: 7px; right: 7px; bottom: 0; height: 4px; background: #2b3038; }
+.rj i { position: absolute; top: -6px; left: 2px; width: 5px; height: 3px; border-radius: 1px; background: #3d444e; animation: led 0.18s steps(1) forwards; }
+.rj:nth-child(1) i { animation-delay: 0.25s; } .rj:nth-child(2) i { animation-delay: 0.35s; }
+.rj:nth-child(3) i { animation-delay: 0.45s; } .rj:nth-child(4) i { animation-delay: 0.55s; }
+.rj:nth-child(5) i { animation-delay: 0.65s; } .rj:nth-child(7) i { animation-delay: 0.85s; }
+.rj.orange i { animation-name: led-orange; animation-delay: 1s; }
+@keyframes led { to { background: #3ddc6a; box-shadow: 0 0 5px #3ddc6a; } }
+@keyframes led-orange { to { background: #ffb21e; box-shadow: 0 0 5px #ffb21e; } }
+@media (prefers-reduced-motion: reduce) {
+  .rj i { animation-duration: 0s; animation-delay: 0s !important; }
+}
+.hero h1 { font-size: clamp(1.75rem, 6vw, 2.5rem); line-height: 1.08; letter-spacing: -0.015em; text-wrap: balance; margin-bottom: 12px; max-width: 18ch; }
 .hero-texte { color: var(--texte-2); max-width: 60ch; }
-.lien-exemple { background: none; border: 0; padding: 0; margin-top: 4px; color: var(--accent); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.lien-exemple { background: none; border: 0; padding: 0; margin-top: 4px; color: var(--accent); font-weight: 600; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
 .hero-texte { margin-bottom: 10px; }
 .comment { margin: 34px 0 8px; }
 .comment > h2 { font-size: 1.1rem; }
@@ -215,13 +249,14 @@ button { font: inherit; color: inherit; cursor: pointer; }
   flex: none;
   display: grid;
   place-items: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: var(--accent);
-  color: var(--accent-texte);
-  font-weight: 800;
-  font-size: 0.85rem;
+  min-width: 26px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 2px;
+  background: var(--etiquette);
+  color: var(--etiquette-texte);
+  font: 700 0.95rem var(--police-titre);
+  box-shadow: 0 1px 0 rgb(0 0 0 / 18%);
 }
 
 /* Aperçu cliquable d'un vrai résultat (ouvre l'exemple). */
@@ -251,16 +286,20 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .num {
   display: grid;
   place-items: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  background: var(--texte);
-  color: var(--fond);
-  font-size: 0.9rem;
-  font-weight: 800;
+  min-width: 30px;
+  height: 26px;
+  padding: 0 7px;
+  border-radius: 2px;
+  background: var(--etiquette);
+  color: var(--etiquette-texte);
+  font: 700 1rem var(--police-titre);
+  box-shadow: 0 1px 0 rgb(0 0 0 / 18%);
+  transform: rotate(-1.5deg);
 }
 .choix-source { display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px; margin-bottom: 10px; }
 .tuile {
+  font-family: var(--police-titre);
+  font-size: 1.08rem;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -268,13 +307,13 @@ button { font: inherit; color: inherit; cursor: pointer; }
   gap: 4px;
   min-height: 128px;
   padding: 16px;
-  border-radius: 16px;
+  border-radius: 10px;
   border: 1px solid var(--bord);
   background: var(--carte);
   cursor: pointer;
   font-weight: 700;
 }
-.tuile small { font-weight: 500; color: var(--texte-2); font-size: 0.82rem; }
+.tuile small { font: 500 0.85rem var(--police); color: var(--texte-2); }
 .tuile svg { margin-bottom: auto; color: var(--accent); }
 .tuile-principale { background: var(--accent); border-color: var(--accent); color: var(--accent-texte); min-height: 128px; box-shadow: var(--ombre); }
 .tuile-principale svg, .tuile-principale small { color: var(--accent-texte); opacity: 0.95; }
@@ -480,11 +519,11 @@ button { font: inherit; color: inherit; cursor: pointer; }
 /* Compte rendu (mise en page de l'impression) */
 .rapport { font-size: 11pt; line-height: 1.45; color: #142033; }
 .rapport h1 { font-size: 20pt; margin: 2px 0 4px; }
-.rapport h2 { font-size: 14pt; margin: 18px 0 8px; padding-bottom: 4px; border-bottom: 2px solid #0e8f88; }
+.rapport h2 { font-size: 14pt; margin: 18px 0 8px; padding-bottom: 4px; border-bottom: 2px solid #1c5fc7; }
 .rapport h3 { font-size: 11.5pt; margin: 12px 0 4px; }
 .rapport h4 { font-size: 10.5pt; margin: 8px 0 4px; }
 .rapport .r-entete { border-bottom: 1px solid #d9dfe9; padding-bottom: 8px; }
-.rapport .r-sur-titre { text-transform: uppercase; letter-spacing: 0.08em; font-size: 9pt; color: #0e8f88; font-weight: 700; margin: 0; }
+.rapport .r-sur-titre { text-transform: uppercase; letter-spacing: 0.08em; font-size: 9pt; color: #1c5fc7; font-weight: 700; margin: 0; }
 .rapport .r-muted { color: #55627a; }
 .rapport .r-verdict { padding: 6px 10px; border-left: 4px solid #5f6b80; background: #eef1f6; }
 .rapport .r-verdict.r-fonctionnel { border-color: #1a8f4c; }
@@ -506,7 +545,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
   /* Toujours le thème clair sur papier, même si l'appli est en sombre. */
   :root, :root:not([data-theme="light"]), :root[data-theme="dark"] {
     --fond: #ffffff; --carte: #ffffff; --carte-2: #eef1f6; --texte: #142033; --texte-2: #55627a; --bord: #d9dfe9;
-    --accent: #0e8f88; --accent-texte: #ffffff; --ok: #1a8f4c; --warn: #b26b00; --ko: #c4302b; --neutre: #5f6b80;
+    --accent: #1c5fc7; --accent-texte: #ffffff; --ok: #1a8f4c; --warn: #b26b00; --ko: #c4302b; --neutre: #5f6b80;
     --chassis: #2a3344; --port-libre: #5b6577; --lien: #3b4b63; --propose: #d97706;
     color-scheme: light;
     padding: 0;
@@ -622,7 +661,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
   border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent);
 }
 .alerte-qualite.insuffisante { background: var(--ko-fond); border-color: color-mix(in srgb, var(--ko) 40%, transparent); }
-.alerte-qualite .symbole { font-size: 24px; line-height: 1; }
+.alerte-qualite .symbole { flex: none; color: var(--warn); }
+.alerte-qualite.insuffisante .symbole { color: var(--ko); }
 .alerte-qualite strong { display: block; color: var(--warn); }
 .alerte-qualite.insuffisante strong { color: var(--ko); }
 .alerte-qualite p { margin: 4px 0 0; font-size: 0.92rem; }

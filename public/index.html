@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>NetScan</title>
   <meta name="description" content="Prends en photo un équipement réseau : schéma, ports, configuration et diagnostic.">
-  <meta name="theme-color" content="#0b1220">
+  <meta name="theme-color" content="#16191e">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="styles.css">
@@ -28,10 +28,12 @@
     <!-- Accueil -->
     <section id="vue-accueil" class="vue">
       <div class="hero">
-        <p class="surtitre">Le Photomath du réseau</p>
+        <div class="facade" aria-hidden="true">
+          <span class="facade-ports"><span class="rj"><i></i></span><span class="rj"><i></i></span><span class="rj"><i></i></span><span class="rj"><i></i></span><span class="rj"><i></i></span><span class="rj orange"><i></i></span><span class="rj"><i></i></span><span class="rj"><i></i></span></span>
+        </div>
         <h1>Photographie ton matériel réseau, NetScan t'explique tout.</h1>
         <p class="hero-texte">Switch, routeur, baie de TP ou écran de config : tu obtiens le schéma avec les ports, la configuration, ce qui ne marche pas et comment le corriger, étape par étape.</p>
-        <button type="button" class="lien-exemple" id="btn-demo-hero">Pas sûr ? Voir un exemple d'analyse →</button>
+        <button type="button" class="lien-exemple" id="btn-demo-hero">Pas sûr ? Voir un exemple d'analyse</button>
       </div>
 
       <section class="etape-form" aria-labelledby="titre-etape-1">
@@ -113,7 +115,7 @@
             <span><strong>Exemple : TP routage inter-VLAN</strong><span class="apercu-sous">Ça ne fonctionne pas : 3 problèmes trouvés</span></span>
           </span>
           <span class="apercu-schema" id="apercu-schema"></span>
-          <span class="apercu-action">Voir un exemple d'analyse →</span>
+          <span class="apercu-action">Voir cet exemple en entier</span>
         </button>
       </section>
     </section>
