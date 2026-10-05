@@ -475,7 +475,7 @@ function rendreQualite(q) {
   const insuffisante = q.niveau === "insuffisante";
   const defauts = (q.problemes ?? []).map((p) => DEFAUTS_PHOTO[p] ?? p).join(", ");
   el.className = `alerte-qualite ${q.niveau}`;
-  el.innerHTML = `<div class="symbole" aria-hidden="true">📷</div>
+  el.innerHTML = `<svg class="symbole" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
     <div>
       <strong>${insuffisante ? "Photo inexploitable : impossible de conclure" : "Photo de qualité moyenne : analyse peut-être incomplète"}${defauts ? ` (${echapper(defauts)})` : ""}</strong>
       ${q.detail ? `<p>${echapper(q.detail)}</p>` : ""}
