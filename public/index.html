@@ -117,6 +117,21 @@
       </div>
       <div id="alerte-qualite" hidden></div>
       <div id="verdict" class="verdict"></div>
+      <details class="carte export" id="panneau-export">
+        <summary>Exporter le compte rendu de TP</summary>
+        <p class="muted petit">Schéma, ports, configuration, diagnostic et étapes, mis en page pour être rendus ou imprimés.</p>
+        <div class="champs-calcul">
+          <label class="champ" for="export-nom"><span>Nom</span><input id="export-nom" type="text" maxlength="60" autocomplete="name" placeholder="Prénom Nom"></label>
+          <label class="champ" for="export-classe"><span>Classe</span><input id="export-classe" type="text" maxlength="40" placeholder="Ex : BTS SIO 1"></label>
+        </div>
+        <label class="champ" for="export-titre"><span>Titre du TP</span><input id="export-titre" type="text" maxlength="120"></label>
+        <div class="actions-ligne" id="boutons-export">
+          <button id="btn-export-pdf" class="btn-principal" type="button">PDF / Imprimer</button>
+          <button id="btn-export-word" class="btn-secondaire" type="button">Word (.docx)</button>
+        </div>
+        <p class="muted petit" id="note-export-pdf">PDF : dans la fenêtre d'impression, choisis « Enregistrer au format PDF » comme imprimante.</p>
+        <p class="muted petit" id="note-export-claude" hidden>Sur claude.ai, l'impression et les téléchargements sont bloqués : exporte depuis <a class="lien-texte" href="https://grfz9.github.io/NetScan/" target="_blank" rel="noopener">le site NetScan</a> (ouvre l'analyse depuis l'historique).</p>
+      </details>
       <nav class="onglets" role="tablist">
         <button role="tab" data-onglet="schema" aria-selected="true">Schéma</button>
         <button role="tab" data-onglet="config" aria-selected="false">Config</button>
@@ -260,6 +275,9 @@
   </main>
 
   <div id="toast" class="toast" role="status" hidden></div>
+
+  <!-- Compte rendu : construit au moment d'exporter, visible seulement à l'impression. -->
+  <div id="rapport" class="rapport" aria-hidden="true"></div>
 
   <script type="module" src="app.js"></script>
 </body>

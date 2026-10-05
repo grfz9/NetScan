@@ -337,6 +337,52 @@ button { font: inherit; color: inherit; cursor: pointer; }
 }
 .besoin .btn-icone { width: 36px; height: 36px; font-size: 18px; }
 
+/* Export du compte rendu */
+.export { margin-bottom: 14px; }
+.export summary { color: var(--texte); }
+.export[open] summary { margin-bottom: 8px; }
+.export .champ { margin: 0 0 8px; }
+.rapport { display: none; }
+
+/* Compte rendu (mise en page de l'impression) */
+.rapport { font-size: 11pt; line-height: 1.45; color: #142033; }
+.rapport h1 { font-size: 20pt; margin: 2px 0 4px; }
+.rapport h2 { font-size: 14pt; margin: 18px 0 8px; padding-bottom: 4px; border-bottom: 2px solid #0e8f88; }
+.rapport h3 { font-size: 11.5pt; margin: 12px 0 4px; }
+.rapport h4 { font-size: 10.5pt; margin: 8px 0 4px; }
+.rapport .r-entete { border-bottom: 1px solid #d9dfe9; padding-bottom: 8px; }
+.rapport .r-sur-titre { text-transform: uppercase; letter-spacing: 0.08em; font-size: 9pt; color: #0e8f88; font-weight: 700; margin: 0; }
+.rapport .r-muted { color: #55627a; }
+.rapport .r-verdict { padding: 6px 10px; border-left: 4px solid #5f6b80; background: #eef1f6; }
+.rapport .r-verdict.r-fonctionnel { border-color: #1a8f4c; }
+.rapport .r-verdict.r-incomplet { border-color: #b26b00; }
+.rapport .r-verdict.r-non_fonctionnel { border-color: #c4302b; }
+.rapport .r-note { font-style: italic; color: #55627a; }
+.rapport .r-figure { margin: 8px 0; text-align: center; break-inside: avoid; }
+.rapport .r-figure svg { width: 100%; max-width: 640px !important; height: auto; }
+.rapport .r-table { width: 100%; border-collapse: collapse; margin: 6px 0 10px; font-size: 9.5pt; }
+.rapport .r-table th, .rapport .r-table td { border: 1px solid #d9dfe9; padding: 4px 6px; text-align: left; vertical-align: top; }
+.rapport .r-table th { background: #eef1f6; }
+.rapport .r-table tr { break-inside: avoid; }
+.rapport .r-code { font: 9pt/1.4 Consolas, ui-monospace, monospace; background: #f2f4f7; border: 1px solid #e3e8ef; padding: 6px 8px; white-space: pre-wrap; break-inside: avoid; }
+.rapport .r-bloc { break-inside: avoid-page; }
+.rapport .r-pied { margin-top: 18px; padding-top: 8px; border-top: 1px solid #d9dfe9; font-size: 8.5pt; color: #55627a; }
+
+@media print {
+  @page { margin: 14mm; }
+  /* Toujours le thème clair sur papier, même si l'appli est en sombre. */
+  :root, :root:not([data-theme="light"]), :root[data-theme="dark"] {
+    --fond: #ffffff; --carte: #ffffff; --carte-2: #eef1f6; --texte: #142033; --texte-2: #55627a; --bord: #d9dfe9;
+    --accent: #0e8f88; --accent-texte: #ffffff; --ok: #1a8f4c; --warn: #b26b00; --ko: #c4302b; --neutre: #5f6b80;
+    --chassis: #2a3344; --port-libre: #5b6577; --lien: #3b4b63; --propose: #d97706;
+    color-scheme: light;
+    padding: 0;
+  }
+  body { background: #fff; }
+  body > :not(#rapport) { display: none !important; }
+  .rapport { display: block !important; }
+}
+
 /* Chargement */
 .scan {
   position: relative;

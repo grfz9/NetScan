@@ -21,6 +21,7 @@ import {
 } from "./coeur.js";
 import { URL_RELAIS } from "./config.js";
 import { initialiserCalcul } from "./ecran-calcul.js";
+import { construireRapportHtml, exporterWord } from "./rapport.js";
 
 const $ = (sel) => document.querySelector(sel);
 const CLE_HISTORIQUE = "netscan.historique";
@@ -29,6 +30,7 @@ const CLE_MODELE = "netscan.modele";
 const CLE_MATERIEL = "netscan.materiel";
 const CLE_CODE = "netscan.codeAcces";
 const CLE_CREDIT = "netscan.credit"; // code NetScan NS-… d'un pack acheté
+const CLE_EXPORT = "netscan.export"; // nom et classe, pour ne pas les retaper à chaque compte rendu
 const RACCOURCIS_MATERIEL = [
   "Routeur Cisco 1841",
   "Routeur Cisco 2911",
@@ -473,6 +475,7 @@ function rendreQualite(q) {
 
 function afficherResultat(r, { demo = false } = {}) {
   etat.resultat = r;
+  preparerExport(r);
   $("#bandeau-demo").hidden = !demo;
   $("#btn-demo-reglages").textContent = modeAnalyse() || SUR_CLAUDE_AI ? "Analyser ma photo" : "Analyser mes photos";
   rendreQualite(r.qualite_image);
@@ -810,6 +813,63 @@ $("#btn-demo").addEventListener("click", lancerDemo);
 $("#btn-accueil").addEventListener("click", () => afficherVue("accueil"));
 $("#btn-historique").addEventListener("click", afficherHistorique);
 $("#btn-calcul").addEventListener("click", () => afficherVue("calcul"));
+
+/* ---------- Export du compte rendu ---------- */
+
+function preparerExport(r) {
+  const panneau = $("#panneau-export");
+  panneau.open = false;
+  let infos = {};
+  try {
+    infos = JSON.parse(lire(CLE_EXPORT) || "{}");
+  } catch {
+    infos = {};
+  }
+  $("#export-nom").value = infos.nom ?? "";
+  $("#export-classe").value = infos.classe ?? "";
+  $("#export-titre").value = r.titre ?? "";
+  // Sur claude.ai, l'impression et les téléchargements sont bloqués par la page.
+  $("#boutons-export").hidden = SUR_CLAUDE_AI;
+  $("#note-export-pdf").hidden = SUR_CLAUDE_AI;
+  $("#note-export-claude").hidden = !SUR_CLAUDE_AI;
+}
+
+function infosExport() {
+  const infos = { nom: $("#export-nom").value.trim(), classe: $("#export-classe").value.trim() };
+  ecrire(CLE_EXPORT, JSON.stringify(infos));
+  return { ...infos, titre: $("#export-titre").value.trim() };
+}
+
+$("#btn-export-pdf").addEventListener("click", () => {
+  if (!etat.resultat) return;
+  $("#rapport").innerHTML = construireRapportHtml(etat.resultat, infosExport());
+  window.print();
+});
+
+$("#btn-export-word").addEventListener("click", async () => {
+  if (!etat.resultat) return;
+  const bouton = $("#btn-export-word");
+  bouton.disabled = true;
+  bouton.textContent = "Création du fichier…";
+  try {
+    const infos = infosExport();
+    $("#rapport").innerHTML = construireRapportHtml(etat.resultat, infos);
+    const blob = await exporterWord(etat.resultat, infos, $("#rapport"));
+    const nom = `NetScan - ${(infos.titre || etat.resultat.titre || "compte rendu").replace(/[\\/:*?"<>|]/g, "-").slice(0, 80)}.docx`;
+    const lien = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: nom });
+    document.body.append(lien);
+    lien.click();
+    lien.remove();
+    setTimeout(() => URL.revokeObjectURL(lien.href), 10_000);
+    toast("Compte rendu Word téléchargé.");
+  } catch (err) {
+    console.error(err);
+    toast("Impossible de créer le fichier Word. Vérifie ta connexion Internet et réessaie.", true);
+  } finally {
+    bouton.disabled = false;
+    bouton.textContent = "Word (.docx)";
+  }
+});
 initialiserCalcul();
 $("#btn-nouvelle").addEventListener("click", () => {
   etat.photos = [];
