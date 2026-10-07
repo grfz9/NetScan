@@ -1,7 +1,30 @@
-// Service worker minimal : rend l'appli installable et garde l'interface en cache.
-// Les analyses (/api) passent toujours par le réseau.
-const CACHE = "netscan-v16";
-const FICHIERS = ["./", "index.html", "styles.css", "app.js", "rendu.js", "coeur.js", "schema.js", "config.js", "calcul-ip.js", "ecran-calcul.js", "rapport.js", "icon.svg", "manifest.webmanifest"];
+// Service worker : rend l'appli installable et la garde utilisable avec une mauvaise connexion.
+// - Les fichiers de l'interface sont mis en cache à l'installation.
+// - Chaque requête redemande d'abord la dernière version au serveur ; le cache ne sert qu'en secours.
+// - Sans réseau ni cache, une page s'ouvre : offline.html.
+// - Les analyses (relais, API) ne passent jamais par le cache.
+const CACHE = "netscan-v18";
+const FICHIERS = [
+  "./",
+  "index.html",
+  "offline.html",
+  "styles.css",
+  "app.js",
+  "rendu.js",
+  "coeur.js",
+  "schema.js",
+  "config.js",
+  "calcul-ip.js",
+  "ecran-calcul.js",
+  "rapport.js",
+  "icon.svg",
+  "icons/icon-192.png",
+  "icons/icon-512.png",
+  "icons/apple-touch-icon.png",
+  "manifest.webmanifest",
+  "playground/baie-brassage.jpg",
+  "playground/analyse.json",
+];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(FICHIERS.map((f) => new Request(f, { cache: "reload" })))));
@@ -18,15 +41,20 @@ self.addEventListener("activate", (e) => {
 self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
   if (e.request.method !== "GET" || url.origin !== location.origin || url.pathname.includes("/api/")) return;
-  // Réseau d'abord, en redemandant toujours la dernière version au serveur ;
-  // le cache ne sert qu'en secours, hors connexion.
   e.respondWith(
     fetch(e.request, { cache: "no-cache" })
       .then((rep) => {
-        const copie = rep.clone();
-        caches.open(CACHE).then((c) => c.put(e.request, copie));
+        if (rep.ok) {
+          const copie = rep.clone();
+          caches.open(CACHE).then((c) => c.put(e.request, copie));
+        }
         return rep;
       })
-      .catch(() => caches.match(e.request))
+      .catch(async () => {
+        const enCache = await caches.match(e.request, { ignoreSearch: true });
+        if (enCache) return enCache;
+        if (e.request.mode === "navigate") return caches.match("offline.html");
+        return Response.error();
+      })
   );
 });

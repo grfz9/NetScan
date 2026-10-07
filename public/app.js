@@ -302,7 +302,7 @@ async function lancerAnalyse() {
     const resultat = await analyser({ images, contexte, materiel, configTexte, onEtape: marquerEtape });
     const vignette = images.length ? await miniatureDepuis(etat.photos[0].apercu).catch(() => "") : "";
     enregistrerHistorique({ resultat, contexte, vignette });
-    afficherResultat(resultat);
+    afficherResultat(resultat, { photos: images.length ? etat.photos.map((p) => p.apercu) : [] });
   } catch (err) {
     afficherVue("accueil");
     toast(err.message || "L'analyse a échoué.", true);
@@ -417,20 +417,19 @@ async function analyserDansNavigateur({ images, contexte, materiel, configTexte,
   }
 }
 
+// Exemple (Playground) : une vraie photo déjà analysée, affichée tout de suite, sans appel à Claude.
+const EXEMPLE = {
+  photo: "playground/baie-brassage.jpg",
+  credit: `Photo : <a href="https://commons.wikimedia.org/wiki/File:19-inch_rackmount_Ethernet_switches_and_patch_panels.jpg" target="_blank" rel="noopener">Dsimic</a>, licence <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.fr" target="_blank" rel="noopener">CC BY-SA 4.0</a>, Wikimedia Commons`,
+};
+
 async function lancerDemo() {
-  $("#scan-image").src = "demo/exemple.svg";
-  afficherVue("chargement");
   try {
-    const reponse = await fetch("demo/exemple.json");
+    const reponse = await fetch("playground/analyse.json");
     const resultat = await reponse.json();
-    for (const e of ORDRE_ETAPES) {
-      marquerEtape(e);
-      await new Promise((r) => setTimeout(r, 380));
-    }
-    afficherResultat(resultat, { demo: true });
+    afficherResultat(resultat, { demo: true, photos: [EXEMPLE.photo], credit: EXEMPLE.credit });
   } catch {
-    afficherVue("accueil");
-    toast("Impossible de charger l'exemple.", true);
+    toast("Impossible de charger l'exemple. Vérifie ta connexion et réessaie.", true);
   }
 }
 
@@ -484,8 +483,9 @@ function rendreQualite(q) {
     </div>`;
 }
 
-function afficherResultat(r, { demo = false } = {}) {
+function afficherResultat(r, { demo = false, photos = [], credit = "" } = {}) {
   etat.resultat = r;
+  etat.photosResultat = { photos, credit };
   preparerExport(r);
   $("#bandeau-demo").hidden = !demo;
   $("#btn-demo-reglages").textContent = modeAnalyse() || SUR_CLAUDE_AI ? "Analyser ma photo" : "Analyser mes photos";
@@ -522,8 +522,18 @@ function afficherResultat(r, { demo = false } = {}) {
   afficherVue("resultat");
 }
 
+function rendrePhotosAnalysees() {
+  const { photos = [], credit = "" } = etat.photosResultat ?? {};
+  if (!photos.length) return "";
+  return `<div class="carte panneau-photo">
+    <div class="panneau-entete"><h3>Photo analysée</h3>${photos.length > 1 ? `<span class="chip">${photos.length} photos</span>` : ""}</div>
+    <div class="photos-analysees">${photos.map((p, i) => `<img src="${p}" alt="Photo analysée ${i + 1}">`).join("")}</div>
+    ${credit ? `<p class="credit">${credit}</p>` : ""}
+  </div>`;
+}
+
 function rendreSchema(r) {
-  let html = `<div class="carte">
+  let html = rendrePhotosAnalysees() + `<div class="carte">
     <h3>${echapper(r.titre)} <span class="chip">${echapper(libelleTypeImage(r.type_image))}</span></h3>
     <p class="muted">${echapper(r.resume)}</p>
     ${equipementsReels(r).length ? `<button class="btn-mini" type="button" id="btn-ajouter-vus">Ajouter ces équipements à mon matériel</button>` : ""}
@@ -821,27 +831,30 @@ $("#fichier-config").addEventListener("change", async (e) => {
   majTailleConfig();
 });
 $("#btn-demo").addEventListener("click", lancerDemo);
-$("#btn-demo-hero").addEventListener("click", lancerDemo);
+$("#btn-exemple-rapide").addEventListener("click", lancerDemo);
 $("#btn-accueil").addEventListener("click", () => afficherVue("accueil"));
 $("#btn-nav-accueil").addEventListener("click", () => afficherVue(etat.resultat && !$("#vue-resultat").hidden ? "resultat" : "accueil"));
 
-// Petit schéma d'aperçu sur l'accueil (même dessin qu'un vrai résultat).
-$("#apercu-schema").innerHTML = dessinerTopologie({
-  equipements: [
-    { id: "R1", nom: "Routeur", type: "routeur", modele: "ISR 2911", ports: [] },
-    { id: "SW1", nom: "Switch", type: "switch", modele: "Catalyst 2960", ports: [] },
-    { id: "PC1", nom: "PC", type: "pc", modele: "VLAN 10", ports: [] },
-    { id: "PC2", nom: "PC", type: "pc", modele: "VLAN 20", ports: [] },
-  ],
-  liens: [
-    { de: "R1", port_de: "Gi0/1", vers: "SW1", port_vers: "Gi0/1", cable: "droit", certitude: "observe" },
-    { de: "SW1", port_de: "Fa0/1", vers: "PC1", port_vers: "", cable: "droit", certitude: "observe" },
-    { de: "SW1", port_de: "Fa0/11", vers: "PC2", port_vers: "", cable: "droit", certitude: "observe" },
-  ],
-  diagnostic: { problemes: [{ gravite: "bloquant", concerne: ["R1", "SW1"] }] },
-});
+
 $("#btn-historique").addEventListener("click", afficherHistorique);
 $("#btn-calcul").addEventListener("click", () => afficherVue("calcul"));
+
+// Thème : sombre par défaut ; le clair est retenu sur l'appareil.
+function majBoutonTheme() {
+  const clair = document.documentElement.dataset.theme === "light";
+  $("#btn-theme").setAttribute("aria-label", clair ? "Passer en thème sombre" : "Passer en thème clair");
+}
+$("#btn-theme").addEventListener("click", () => {
+  const clair = document.documentElement.dataset.theme !== "light";
+  if (clair) document.documentElement.dataset.theme = "light";
+  else delete document.documentElement.dataset.theme;
+  ecrire("netscan.theme", clair ? "light" : "");
+  majBoutonTheme();
+
+// Raccourci de l'appli installée (« Calcul IP ») : ./#calcul
+if (location.hash === "#calcul") afficherVue("calcul");
+});
+majBoutonTheme();
 
 /* ---------- Export du compte rendu ---------- */
 

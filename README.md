@@ -153,3 +153,8 @@ L'historique des analyses est gardé dans le navigateur (localStorage), sur l'ap
 ## Licence
 
 MIT
+
+## Crédits
+
+Photo d'exemple (`public/playground/baie-brassage.jpg`) : « 19-inch rackmount Ethernet switches and patch panels », par [Dsimic](https://commons.wikimedia.org/wiki/File:19-inch_rackmount_Ethernet_switches_and_patch_panels.jpg), licence [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.fr), via Wikimedia Commons. Photo non modifiée ; l'analyse affichée par-dessus est celle de NetScan.
+
