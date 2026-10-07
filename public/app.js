@@ -442,7 +442,7 @@ async function reparerAppli(raison) {
 async function lancerDemo() {
   let resultat;
   try {
-    const reponse = await fetch("playground/analyse.json", { cache: "no-cache" });
+    const reponse = await fetch("playground/exemple-baie.json", { cache: "no-cache" });
     if (!reponse.ok) throw new Error(`le serveur répond ${reponse.status}`);
     resultat = await reponse.json();
   } catch (err) {
