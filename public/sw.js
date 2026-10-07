@@ -3,7 +3,7 @@
 // - Chaque requête redemande d'abord la dernière version au serveur ; le cache ne sert qu'en secours.
 // - Sans réseau ni cache, une page s'ouvre : offline.html.
 // - Les analyses (relais, API) ne passent jamais par le cache.
-const CACHE = "netscan-v19";
+const CACHE = "netscan-v20";
 const FICHIERS = [
   "./",
   "index.html",
@@ -23,7 +23,7 @@ const FICHIERS = [
   "icons/apple-touch-icon.png",
   "manifest.webmanifest",
   "playground/baie-brassage.jpg",
-  "playground/analyse.json",
+  "playground/exemple-baie.json",
 ];
 
 self.addEventListener("install", (e) => {
