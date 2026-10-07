@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NetScan hors connexion</title>
+  <meta name="theme-color" content="#0f1318">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <style>
+    :root { color-scheme: dark; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; box-sizing: border-box; background: #0f1318; color: #e3e8ee; font: 17px/1.5 "Barlow", "Segoe UI", system-ui, sans-serif; }
+    main { max-width: 46ch; }
+    h1 { font: 700 1.8rem "Barlow Semi Condensed", "Barlow", system-ui, sans-serif; margin: 16px 0 8px; }
+    p { color: #93a0ae; margin: 0 0 12px; }
+    .facade { display: flex; gap: 5px; padding: 10px 12px; width: fit-content; border-radius: 4px; background: #1f252d; }
+    .facade i { position: relative; width: 22px; height: 17px; background: #0e1014; }
+    .facade i::before { content: ""; position: absolute; top: -6px; left: 2px; width: 5px; height: 3px; background: #3d444e; }
+    a { color: #4c8dff; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="facade" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <h1>Pas de connexion</h1>
+    <p>Les analyses ont besoin d'Internet pour envoyer tes photos. Le calcul IP et ton historique restent disponibles une fois l'appli ouverte au moins une fois.</p>
+    <p><a href="./">Réessayer</a></p>
+  </main>
+</body>
+</html>

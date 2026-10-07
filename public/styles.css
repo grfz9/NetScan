@@ -1,6 +1,42 @@
-@import url("https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Semi+Condensed:wght@600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Semi+Condensed:wght@600;700&family=JetBrains+Mono:wght@400;500;700&display=swap");
 
 :root {
+  /* Sombre par défaut : une console d'administration réseau. */
+  --fond: #0f1318;
+  --carte: #161b22;
+  --carte-2: #1d242d;
+  --texte: #e3e8ee;
+  --texte-2: #93a0ae;
+  --bord: #29313b;
+  --accent: #4c8dff;
+  --accent-texte: #06132b;
+  --ok: #3fb950;
+  --ok-fond: #12261a;
+  --warn: #e3a008;
+  --warn-fond: #2e2410;
+  --ko: #f2555a;
+  --ko-fond: #34171a;
+  --neutre: #93a0ae;
+  --neutre-fond: #222a33;
+  --code-fond: #0b0e12;
+  --code-texte: #d6dde6;
+  --chassis: #1f252d;
+  --port-libre: #5c6672;
+  --port-ok: #3fb950;
+  --lien: #8a98a8;
+  --propose: #e3a008;
+  --etiquette: #e9c23a;
+  --etiquette-texte: #1c1a10;
+  --ombre: none;
+  color-scheme: dark;
+  --rayon: 6px;
+  --police: "Barlow", "Segoe UI", system-ui, sans-serif;
+  --police-titre: "Barlow Semi Condensed", "Barlow", "Segoe UI", system-ui, sans-serif;
+  --police-mono: "JetBrains Mono", "Cascadia Code", Consolas, ui-monospace, monospace;
+}
+
+/* Thème clair, choisi par la personne (bouton soleil) ou par le lecteur claude.ai. */
+:root[data-theme="light"] {
   --fond: #e4e8ec;
   --carte: #fbfcfd;
   --carte-2: #edf0f3;
@@ -26,69 +62,8 @@
   --propose: #d27a00;
   --etiquette: #f2cc3d;
   --etiquette-texte: #1c1a10;
-  --rayon: 8px;
   --ombre: 0 1px 0 rgb(23 32 43 / 6%);
-  --police: "Barlow", "Segoe UI", system-ui, sans-serif;
-  --police-titre: "Barlow Semi Condensed", "Barlow", "Segoe UI", system-ui, sans-serif;
   color-scheme: light;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --fond: #16191e;
-    --carte: #1e2329;
-    --carte-2: #262c33;
-    --texte: #e6eaee;
-    --texte-2: #9aa5b1;
-    --bord: #333b45;
-    --accent: #5c9bff;
-    --accent-texte: #0b1a33;
-    --ok: #4cc26e;
-    --ok-fond: #16301f;
-    --warn: #f0b43c;
-    --warn-fond: #33280f;
-    --ko: #f0716a;
-    --ko-fond: #3a1a18;
-    --neutre: #9aa5b1;
-    --neutre-fond: #252b32;
-    --code-fond: #0f1216;
-    --chassis: #262b32;
-    --port-libre: #69737f;
-    --lien: #93a1b1;
-    --propose: #f0b43c;
-    --etiquette: #e9c23a;
-    --etiquette-texte: #1c1a10;
-    --ombre: none;
-    color-scheme: dark;
-  }
-}
-
-:root[data-theme="dark"] {
-  --fond: #16191e;
-  --carte: #1e2329;
-  --carte-2: #262c33;
-  --texte: #e6eaee;
-  --texte-2: #9aa5b1;
-  --bord: #333b45;
-  --accent: #5c9bff;
-  --accent-texte: #0b1a33;
-  --ok: #4cc26e;
-  --ok-fond: #16301f;
-  --warn: #f0b43c;
-  --warn-fond: #33280f;
-  --ko: #f0716a;
-  --ko-fond: #3a1a18;
-  --neutre: #9aa5b1;
-  --neutre-fond: #252b32;
-  --code-fond: #0f1216;
-  --chassis: #262b32;
-  --port-libre: #69737f;
-  --lien: #93a1b1;
-  --propose: #f0b43c;
-  --etiquette: #e9c23a;
-  --etiquette-texte: #1c1a10;
-  --ombre: none;
-  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -404,7 +379,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .solde strong { font-size: 1.4rem; font-variant-numeric: tabular-nums; color: var(--accent); }
 .mon-code { display: grid; gap: 6px; margin: 4px 0 12px; padding: 10px 12px; border-radius: 10px; background: var(--carte-2); }
 .ligne-code { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
-.ligne-code code { font: 700 1rem ui-monospace, Consolas, monospace; letter-spacing: 0.04em; overflow-wrap: anywhere; }
+.ligne-code code { font: 700 0.95rem var(--police-mono); letter-spacing: 0.04em; overflow-wrap: anywhere; }
 .case-cgv { align-items: flex-start; margin: 8px 0 4px; }
 .case-cgv input { margin-top: 3px; }
 .case-cgv a { color: var(--accent); }
@@ -413,7 +388,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .bloc-config-texte { margin: 4px 0 8px; }
 .bloc-config-texte summary { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--texte); }
 .bloc-config-texte[open] summary { margin-bottom: 8px; }
-.bloc-config-texte code { font: 600 0.85em ui-monospace, Consolas, monospace; }
+.bloc-config-texte code { font: 500 0.85em var(--police-mono); }
 .bloc-config-texte textarea {
   width: 100%;
   resize: vertical;
@@ -422,7 +397,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
   border: 1px solid var(--bord);
   background: var(--code-fond);
   color: var(--code-texte);
-  font: 13px/1.5 ui-monospace, "Cascadia Code", Consolas, monospace;
+  font: 13px/1.55 var(--police-mono);
   margin-bottom: 8px;
 }
 
@@ -484,13 +459,13 @@ button { font: inherit; color: inherit; cursor: pointer; }
   border: 1px solid var(--bord);
   background: var(--carte);
   color: var(--texte);
-  font: 500 1rem ui-monospace, Consolas, monospace;
+  font: 500 0.95rem var(--police-mono);
 }
 .champ-titre { font-weight: 600; margin: 12px 0 6px; }
 .table-calcul th { width: 48%; font-weight: 500; }
-.table-calcul code, .table-vlsm code { font: 600 0.9em ui-monospace, Consolas, monospace; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.table-calcul code, .table-vlsm code { font: 500 0.88em var(--police-mono); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .table-vlsm td, .table-vlsm th { white-space: nowrap; }
-.binaire { margin: 0; font: 13px/1.7 ui-monospace, Consolas, monospace; white-space: pre; }
+.binaire { margin: 0; font: 13px/1.7 var(--police-mono); white-space: pre; }
 .bit-reseau { color: var(--accent); font-weight: 700; }
 .bit-hote { color: var(--warn); }
 .binaire .point { color: var(--texte-2); }
@@ -760,7 +735,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .bascule-schema button[data-vue="conseille"][aria-pressed="true"] { color: var(--ok); }
 .avantages { margin: 8px 0 0; padding-left: 20px; display: grid; gap: 4px; }
 .changements { margin: 8px 0 0; padding-left: 22px; display: grid; gap: 6px; }
-.connexions code { font: 600 0.85em ui-monospace, Consolas, monospace; padding: 1px 5px; border-radius: 5px; background: var(--carte); }
+.connexions code { font: 500 0.85em var(--police-mono); padding: 1px 5px; border-radius: 5px; background: var(--carte); }
 .topologie .icone { color: var(--texte); }
 .topologie .noeud { cursor: pointer; }
 .entete-schema { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
@@ -821,7 +796,7 @@ summary { cursor: pointer; font-weight: 600; color: var(--accent); }
   margin: 0;
   padding: 34px 14px 12px;
   overflow-x: auto;
-  font: 13px/1.55 ui-monospace, "Cascadia Code", Consolas, monospace;
+  font: 13px/1.6 var(--police-mono);
 }
 .code .cmt { color: #7f8ba3; }
 .code .mot { color: #5eead4; }
@@ -920,3 +895,72 @@ summary { cursor: pointer; font-weight: 600; color: var(--accent); }
   z-index: 50;
 }
 .toast.erreur { background: var(--ko); color: #fff; }
+
+
+/* =================== Console : mise en page et panneaux =================== */
+main { max-width: 1180px; }
+.vue:not(#vue-accueil) { max-width: 900px; margin-inline: auto; }
+
+.carte { border-radius: var(--rayon); }
+.carte > h3, .panneau-entete h2, .panneau-entete h3 { font-size: 1rem; }
+.panneau-entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: -16px -16px 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--bord);
+  background: var(--carte-2);
+  border-radius: var(--rayon) var(--rayon) 0 0;
+}
+.panneau-entete h2, .panneau-entete h3 { margin: 0; }
+.chip { font-family: var(--police-mono); font-weight: 500; letter-spacing: 0; }
+.topologie .port-etiquette { font-family: var(--police-mono); font-weight: 500; }
+code, kbd { font-family: var(--police-mono); }
+
+/* En-tête de l'accueil : façade + titre, compact. */
+.tete-espace { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; margin: 4px 0 22px; }
+.tete-espace .facade { margin: 0; }
+.tete-espace h1 { font-size: clamp(1.6rem, 4vw, 2.1rem); margin-bottom: 4px; }
+.tete-texte { color: var(--texte-2); max-width: 62ch; margin: 0; }
+
+/* Espace de travail : saisie à gauche, exemple à droite. */
+.espace { display: grid; gap: 22px; align-items: start; }
+@media (min-width: 960px) {
+  .espace { grid-template-columns: minmax(0, 1.3fr) minmax(320px, 1fr); }
+  .colonne-exemple { position: sticky; top: 76px; }
+}
+.colonne-saisie > .etape-form:first-child { margin-top: 0; }
+
+/* Panneau « Essayer avec un exemple » */
+.panneau-exemple .btn-principal { background: var(--accent); color: var(--accent-texte); margin-top: 12px; }
+.photo-exemple { margin: 0; }
+.photo-exemple img, .photos-analysees img { display: block; width: 100%; height: auto; border-radius: 4px; border: 1px solid var(--bord); }
+.credit { font-size: 0.75rem; color: var(--texte-2); margin: 6px 0 0; }
+.credit a { color: inherit; }
+.mesures { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin: 12px 0 0; background: var(--bord); border: 1px solid var(--bord); border-radius: 4px; overflow: hidden; }
+.mesures div { background: var(--carte); padding: 8px 10px; }
+.mesures dt { font-size: 0.75rem; color: var(--texte-2); }
+.mesures dd { margin: 0; font: 700 1.3rem var(--police-mono); }
+.txt-ko { color: var(--ko); }
+.comment { margin-top: 18px; }
+.comment .parcours { grid-template-columns: 1fr; }
+
+/* Photo analysée en tête du résultat */
+.photos-analysees { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; }
+
+/* Bouton de thème */
+.btn-theme { margin-left: 8px; }
+.btn-theme .icone-lune { display: none; }
+:root[data-theme="light"] .btn-theme .icone-soleil { display: none; }
+:root[data-theme="light"] .btn-theme .icone-lune { display: block; }
+.barre { gap: 8px; }
+.barre .navigation { margin-left: auto; }
+
+/* États de focus visibles au clavier */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Sur ordinateur, le panneau d'exemple est déjà visible à droite. */
+.exemple-mobile { margin-top: 8px; }
+@media (min-width: 960px) { .exemple-mobile { display: none; } }

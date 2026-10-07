@@ -1,0 +1,1211 @@
+{
+  "type_image": "equipement_physique",
+  "qualite_image": {
+    "niveau": "moyenne",
+    "problemes": [
+      "coupee"
+    ],
+    "detail": "Les cordons enroulés cachent une partie des ports des switchs, et l'arrière du routeur Cisco n'est pas visible.",
+    "conseil": "Ajoute une photo de près de chaque switch et une de l'arrière du routeur pour suivre chaque câble."
+  },
+  "titre": "Baie de brassage : 2 switchs D-Link et un routeur Cisco 870",
+  "resume": "Baie 19 pouces bien rangée : deux panneaux de brassage Panduit (ports 1 à 48), un panneau téléphonique (T-01 à T-14), des passe-câbles, deux switchs D-Link Web Smart de 24 ports et un routeur Cisco série 870 posé sur une tablette. Les cordons partent des panneaux vers les switchs ; aucune liaison vers le routeur n'est visible.",
+  "equipements": [
+    {
+      "id": "PP1",
+      "nom": "Panneau de brassage 1-24",
+      "type": "panneau_brassage",
+      "marque": "Panduit",
+      "modele": "24 ports Cat 6",
+      "confiance": "haute",
+      "role": "Relie les prises des bureaux 1 à 24 aux switchs.",
+      "ports": [
+        {
+          "nom": "1",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "2",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "3",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "4",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "5",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "6",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "7",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "8",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "9",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "10",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "11",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "12",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "13",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "14",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "15",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "16",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "17",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "18",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "19",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "20",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "21",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "22",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "23",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "24",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "id": "PP2",
+      "nom": "Panneau de brassage 25-48",
+      "type": "panneau_brassage",
+      "marque": "Panduit",
+      "modele": "24 ports Cat 6",
+      "confiance": "haute",
+      "role": "Relie les prises des bureaux 25 à 48 aux switchs.",
+      "ports": [
+        {
+          "nom": "25",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "26",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "27",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "28",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "29",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "30",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "31",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "32",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "33",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "34",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "35",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "36",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "37",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "38",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "39",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "40",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "41",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "42",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "43",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "44",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "45",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "46",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "47",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "48",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "id": "PP3",
+      "nom": "Panneau téléphonique",
+      "type": "panneau_brassage",
+      "marque": "",
+      "modele": "Prises T-01 à T-14",
+      "confiance": "moyenne",
+      "role": "Lignes téléphoniques : une seule prise (T-07) est brassée.",
+      "ports": [
+        {
+          "nom": "T-01",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "T-02",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "T-03",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "T-04",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "T-05",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "T-06",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "T-07",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "Prise téléphonique"
+        },
+        {
+          "nom": "T-08",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "T-09",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "T-10",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "T-11",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "T-12",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "T-13",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "T-14",
+          "type": "ethernet",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "id": "SW1",
+      "nom": "Switch D-Link Web Smart",
+      "type": "switch",
+      "marque": "D-Link",
+      "modele": "Web Smart 24 ports",
+      "confiance": "moyenne",
+      "role": "Switch d'accès des prises 1 à 24.",
+      "ports": [
+        {
+          "nom": "1",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "2",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "3",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "4",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "5",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "6",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "7",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "8",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "9",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "10",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "11",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "12",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "13",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "14",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "15",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "16",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "17",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "18",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "19",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "20",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "21",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "22",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "23",
+          "type": "ethernet",
+          "etat": "inconnu",
+          "source": "deduit",
+          "detail": ""
+        },
+        {
+          "nom": "24",
+          "type": "ethernet",
+          "etat": "inconnu",
+          "source": "deduit",
+          "detail": ""
+        },
+        {
+          "nom": "SFP 25",
+          "type": "sfp",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "SFP 26",
+          "type": "sfp",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "id": "SW2",
+      "nom": "Switch D-Link Web Smart",
+      "type": "switch",
+      "marque": "D-Link",
+      "modele": "Web Smart 24 ports",
+      "confiance": "moyenne",
+      "role": "Switch d'accès des prises 25 à 48.",
+      "ports": [
+        {
+          "nom": "1",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "2",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "3",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "4",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "5",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "6",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "7",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "8",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "9",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "10",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "11",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "12",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "13",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "14",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "15",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "16",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "17",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "18",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "19",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "20",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "21",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "22",
+          "type": "ethernet",
+          "etat": "connecte",
+          "source": "visible",
+          "detail": "LED verte"
+        },
+        {
+          "nom": "23",
+          "type": "ethernet",
+          "etat": "inconnu",
+          "source": "deduit",
+          "detail": ""
+        },
+        {
+          "nom": "24",
+          "type": "ethernet",
+          "etat": "inconnu",
+          "source": "deduit",
+          "detail": ""
+        },
+        {
+          "nom": "SFP 25",
+          "type": "sfp",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        },
+        {
+          "nom": "SFP 26",
+          "type": "sfp",
+          "etat": "libre",
+          "source": "visible",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "id": "R1",
+      "nom": "Routeur Cisco 870",
+      "type": "routeur",
+      "marque": "Cisco",
+      "modele": "870 Series",
+      "confiance": "moyenne",
+      "role": "Passerelle vers Internet du réseau.",
+      "ports": [
+        {
+          "nom": "Fa0",
+          "type": "ethernet",
+          "etat": "inconnu",
+          "source": "fiche_technique",
+          "detail": "Port LAN (switch intégré)"
+        },
+        {
+          "nom": "Fa1",
+          "type": "ethernet",
+          "etat": "inconnu",
+          "source": "fiche_technique",
+          "detail": "Port LAN"
+        },
+        {
+          "nom": "Fa2",
+          "type": "ethernet",
+          "etat": "inconnu",
+          "source": "fiche_technique",
+          "detail": "Port LAN"
+        },
+        {
+          "nom": "Fa3",
+          "type": "ethernet",
+          "etat": "inconnu",
+          "source": "fiche_technique",
+          "detail": "Port LAN"
+        },
+        {
+          "nom": "Fa4",
+          "type": "wan",
+          "etat": "inconnu",
+          "source": "fiche_technique",
+          "detail": "Port WAN vers la box ou le modem"
+        },
+        {
+          "nom": "Console",
+          "type": "console",
+          "etat": "inconnu",
+          "source": "fiche_technique",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "id": "WAN",
+      "nom": "Internet",
+      "type": "cloud_internet",
+      "marque": "",
+      "modele": "",
+      "confiance": "faible",
+      "role": "Accès opérateur.",
+      "ports": []
+    }
+  ],
+  "liens": [
+    {
+      "de": "PP1",
+      "port_de": "1-24",
+      "vers": "SW1",
+      "port_vers": "1-24",
+      "cable": "droit",
+      "certitude": "deduit",
+      "remarque": "Cordons de brassage gris ; la correspondance port par port n'est pas visible."
+    },
+    {
+      "de": "PP2",
+      "port_de": "25-48",
+      "vers": "SW2",
+      "port_vers": "1-24",
+      "cable": "droit",
+      "certitude": "deduit",
+      "remarque": "Cordons de brassage gris ; 3 prises libres (29, 30, 44)."
+    },
+    {
+      "de": "SW1",
+      "port_de": "23",
+      "vers": "SW2",
+      "port_vers": "23",
+      "cable": "droit",
+      "certitude": "propose",
+      "remarque": "Liaison entre les deux switchs, non visible sur la photo."
+    },
+    {
+      "de": "SW1",
+      "port_de": "24",
+      "vers": "R1",
+      "port_vers": "Fa0",
+      "cable": "droit",
+      "certitude": "propose",
+      "remarque": "Liaison vers le routeur, non visible sur la photo."
+    },
+    {
+      "de": "R1",
+      "port_de": "Fa4",
+      "vers": "WAN",
+      "port_vers": "",
+      "cable": "droit",
+      "certitude": "propose",
+      "remarque": "Sortie Internet vers la box ou le modem opérateur."
+    }
+  ],
+  "configuration": {
+    "source": "proposee",
+    "systeme": "Cisco IOS (routeur) et interface web D-Link (switchs)",
+    "blocs": [
+      {
+        "equipement": "R1",
+        "titre": "LAN et passerelle",
+        "commandes": "interface Vlan1\n ip address 192.168.1.1 255.255.255.0\n ip nat inside\n no shutdown\n!\ninterface FastEthernet0\n no shutdown",
+        "explication": "Les ports Fa0 à Fa3 du Cisco 870 forment un petit switch intégré (VLAN 1). L'adresse 192.168.1.1 est un exemple : c'est la passerelle des postes."
+      },
+      {
+        "equipement": "R1",
+        "titre": "Sortie Internet et NAT",
+        "commandes": "interface FastEthernet4\n ip address dhcp\n ip nat outside\n no shutdown\n!\naccess-list 1 permit 192.168.1.0 0.0.0.255\nip nat inside source list 1 interface FastEthernet4 overload",
+        "explication": "Fa4 récupère son adresse auprès de la box ; le NAT permet à tout le réseau 192.168.1.0/24 de sortir avec cette adresse."
+      },
+      {
+        "equipement": "R1",
+        "titre": "DHCP pour les postes",
+        "commandes": "ip dhcp excluded-address 192.168.1.1 192.168.1.20\nip dhcp pool LAN\n network 192.168.1.0 255.255.255.0\n default-router 192.168.1.1\n dns-server 1.1.1.1",
+        "explication": "Les postes branchés sur les prises reçoivent une adresse automatiquement ; les 20 premières sont gardées pour les équipements."
+      },
+      {
+        "equipement": "SW1",
+        "titre": "Interface web D-Link",
+        "commandes": "1. Navigateur : http://10.90.90.90 (adresse par défaut)\n2. System > IP Address : 192.168.1.2 / 255.255.255.0, passerelle 192.168.1.1\n3. Tools > Save Configuration",
+        "explication": "Les switchs D-Link Web Smart se configurent depuis une page web, pas en ligne de commande. Donner une adresse du réseau permet de les administrer à distance."
+      },
+      {
+        "equipement": "SW2",
+        "titre": "Interface web D-Link",
+        "commandes": "1. Navigateur : http://10.90.90.90\n2. System > IP Address : 192.168.1.3 / 255.255.255.0, passerelle 192.168.1.1\n3. Tools > Save Configuration",
+        "explication": "Même réglage que SW1 avec une autre adresse. Change l'adresse du premier switch avant de brancher le second : ils ont la même adresse par défaut."
+      }
+    ]
+  },
+  "diagnostic": {
+    "statut": "incomplet",
+    "resume": "Le brassage est propre et les switchs sont actifs, mais rien ne relie visiblement les switchs entre eux ni au routeur : sans ces liaisons, les postes n'auraient pas accès à Internet.",
+    "problemes": [
+      {
+        "titre": "Aucune liaison visible vers le routeur",
+        "gravite": "bloquant",
+        "concerne": [
+          "SW1",
+          "R1"
+        ],
+        "explication": "Les postes passent par les switchs ; pour sortir sur Internet, au moins un switch doit être relié à un port LAN du routeur.",
+        "correction": "Relier le port 24 de SW1 au port Fa0 du routeur avec un cordon droit."
+      },
+      {
+        "titre": "Pas de liaison visible entre les deux switchs",
+        "gravite": "important",
+        "concerne": [
+          "SW1",
+          "SW2"
+        ],
+        "explication": "Sans liaison, les prises 25 à 48 (branchées sur SW2) ne peuvent joindre ni SW1 ni le routeur.",
+        "correction": "Relier le port 23 de SW1 au port 23 de SW2, ou les ports SFP avec un module et une fibre."
+      },
+      {
+        "titre": "Cordons trop longs enroulés devant les switchs",
+        "gravite": "conseil",
+        "concerne": [
+          "SW1",
+          "SW2"
+        ],
+        "explication": "Les boucles cachent les LED et les numéros de ports, ce qui complique le dépannage.",
+        "correction": "Remplacer par des cordons de 0,5 m entre les panneaux et les switchs."
+      },
+      {
+        "titre": "Pas d'étiquette côté switch",
+        "gravite": "conseil",
+        "concerne": [
+          "SW1",
+          "SW2"
+        ],
+        "explication": "Les panneaux sont numérotés, mais rien n'indique quelle prise arrive sur quel port des switchs.",
+        "correction": "Noter la correspondance (ex : prise 12 → SW1 port 12) dans un tableau de brassage."
+      }
+    ],
+    "verifications": [
+      {
+        "equipement": "R1",
+        "commande": "show ip interface brief",
+        "attendu": "Vlan1 et FastEthernet4 en up / up, avec leurs adresses."
+      },
+      {
+        "equipement": "R1",
+        "commande": "show ip dhcp binding",
+        "attendu": "La liste des postes qui ont reçu une adresse."
+      },
+      {
+        "equipement": "PC",
+        "commande": "ping 192.168.1.1",
+        "attendu": "Des réponses du routeur depuis une prise des deux panneaux."
+      },
+      {
+        "equipement": "PC",
+        "commande": "tracert 1.1.1.1",
+        "attendu": "Le premier saut est 192.168.1.1, puis la box."
+      }
+    ]
+  },
+  "schema_propose": {
+    "objectif": "Donner l'accès à Internet aux 48 prises, avec un seul chemin clair par switch.",
+    "equipements": [
+      {
+        "id": "WAN",
+        "nom": "Internet",
+        "type": "cloud_internet",
+        "modele": ""
+      },
+      {
+        "id": "R1",
+        "nom": "Routeur Cisco 870",
+        "type": "routeur",
+        "modele": "870 Series"
+      },
+      {
+        "id": "SW1",
+        "nom": "Switch D-Link",
+        "type": "switch",
+        "modele": "Web Smart 24 ports"
+      },
+      {
+        "id": "SW2",
+        "nom": "Switch D-Link",
+        "type": "switch",
+        "modele": "Web Smart 24 ports"
+      },
+      {
+        "id": "PP1",
+        "nom": "Panneau 1-24",
+        "type": "panneau_brassage",
+        "modele": "Prises 1-24"
+      },
+      {
+        "id": "PP2",
+        "nom": "Panneau 25-48",
+        "type": "panneau_brassage",
+        "modele": "Prises 25-48"
+      }
+    ],
+    "liens": [
+      {
+        "de": "R1",
+        "port_de": "Fa4",
+        "vers": "WAN",
+        "port_vers": "",
+        "cable": "droit",
+        "remarque": "Sortie Internet"
+      },
+      {
+        "de": "R1",
+        "port_de": "Fa0",
+        "vers": "SW1",
+        "port_vers": "24",
+        "cable": "droit",
+        "remarque": "Lien vers le premier switch"
+      },
+      {
+        "de": "SW1",
+        "port_de": "23",
+        "vers": "SW2",
+        "port_vers": "23",
+        "cable": "droit",
+        "remarque": "Lien entre les switchs"
+      },
+      {
+        "de": "PP1",
+        "port_de": "1-22",
+        "vers": "SW1",
+        "port_vers": "1-22",
+        "cable": "droit",
+        "remarque": "Cordons de 0,5 m"
+      },
+      {
+        "de": "PP2",
+        "port_de": "25-46",
+        "vers": "SW2",
+        "port_vers": "1-22",
+        "cable": "droit",
+        "remarque": "Cordons de 0,5 m"
+      }
+    ],
+    "avantages": [
+      "Chaque prise a un seul chemin vers Internet : prise → switch → routeur, facile à suivre en cas de panne.",
+      "Les ports 23 et 24 des switchs sont réservés aux liaisons : on sait tout de suite où regarder.",
+      "Des cordons courts laissent voir les LED de chaque port."
+    ],
+    "changements": [
+      "Brancher un cordon droit entre le port 24 de SW1 et le port Fa0 du routeur.",
+      "Brancher un cordon droit entre le port 23 de SW1 et le port 23 de SW2.",
+      "Déplacer les cordons arrivant sur les ports 23 et 24 vers des ports libres.",
+      "Remplacer les cordons longs par des cordons de 0,5 m."
+    ]
+  },
+  "materiel_a_prevoir": [
+    {
+      "element": "Cordons RJ45 Cat 6 de 0,5 m",
+      "quantite": "48",
+      "raison": "Remplacer les cordons trop longs enroulés devant les switchs."
+    },
+    {
+      "element": "Cordons RJ45 Cat 6 de 1 m",
+      "quantite": "2",
+      "raison": "Liaisons SW1 ⟷ SW2 et SW1 ⟷ routeur."
+    }
+  ],
+  "etapes": [
+    {
+      "titre": "J'identifie la baie de haut en bas",
+      "detail": "Deux panneaux Panduit numérotés 1-24 et 25-48, un panneau téléphonique T-01 à T-14, des passe-câbles, deux switchs D-Link Web Smart et un routeur Cisco 870 sur une tablette."
+    },
+    {
+      "titre": "Je suis les cordons",
+      "detail": "Les cordons gris partent des panneaux et descendent vers les deux switchs. Leurs LED vertes montrent que les ports sont actifs."
+    },
+    {
+      "titre": "Je cherche le chemin vers Internet",
+      "detail": "Aucun cordon ne relie visiblement les switchs au routeur, ni les switchs entre eux. Le routeur semble isolé."
+    },
+    {
+      "titre": "Je compare avec un câblage qui fonctionne",
+      "detail": "Pour que chaque prise sorte sur Internet, il faut au moins prise → switch → routeur → box."
+    },
+    {
+      "titre": "Je conclus",
+      "detail": "Le brassage est propre, mais incomplet : deux liaisons manquent. Le schéma conseillé les ajoute."
+    }
+  ],
+  "limites": "Les ports exacts reliés à chaque prise et l'arrière du routeur ne sont pas visibles. Le modèle exact des switchs D-Link n'est pas lisible."
+}
