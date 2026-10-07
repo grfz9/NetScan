@@ -423,13 +423,40 @@ const EXEMPLE = {
   credit: `Photo : <a href="https://commons.wikimedia.org/wiki/File:19-inch_rackmount_Ethernet_switches_and_patch_panels.jpg" target="_blank" rel="noopener">Dsimic</a>, licence <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.fr" target="_blank" rel="noopener">CC BY-SA 4.0</a>, Wikimedia Commons`,
 };
 
-async function lancerDemo() {
+// Si l'appli a gardé de vieux fichiers en cache avec de nouveaux, certaines pages plantent sans
+// raison apparente. On vide alors les caches et le service worker, puis on recharge, une seule fois.
+async function reparerAppli(raison) {
+  console.error("NetScan : réparation de l'appli", raison);
   try {
-    const reponse = await fetch("playground/analyse.json");
-    const resultat = await reponse.json();
-    afficherResultat(resultat, { demo: true, photos: [EXEMPLE.photo], credit: EXEMPLE.credit });
+    if (sessionStorage.getItem("netscan.reparee")) return false;
+    sessionStorage.setItem("netscan.reparee", "1");
+    for (const reg of await navigator.serviceWorker?.getRegistrations?.() ?? []) await reg.unregister();
+    for (const cle of await caches.keys()) await caches.delete(cle);
+    location.reload();
+    return true;
   } catch {
-    toast("Impossible de charger l'exemple. Vérifie ta connexion et réessaie.", true);
+    return false;
+  }
+}
+
+async function lancerDemo() {
+  let resultat;
+  try {
+    const reponse = await fetch("playground/analyse.json", { cache: "no-cache" });
+    if (!reponse.ok) throw new Error(`le serveur répond ${reponse.status}`);
+    resultat = await reponse.json();
+  } catch (err) {
+    console.error(err);
+    toast(`L'exemple n'a pas pu être téléchargé (${err.message}). Réessaie dans un instant.`, true);
+    return;
+  }
+  try {
+    afficherResultat(resultat, { demo: true, photos: [EXEMPLE.photo], credit: EXEMPLE.credit });
+  } catch (err) {
+    // Le fichier est bien arrivé : le problème vient de l'appli, pas de la connexion.
+    console.error(err);
+    if (await reparerAppli(err)) return toast("Mise à jour de l'appli en cours…");
+    toast(`L'exemple n'a pas pu s'afficher (${err.message}). Recharge la page avec Ctrl + Maj + R.`, true);
   }
 }
 
