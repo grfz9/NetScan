@@ -964,3 +964,84 @@ code, kbd { font-family: var(--police-mono); }
 /* Sur ordinateur, le panneau d'exemple est déjà visible à droite. */
 .exemple-mobile { margin-top: 8px; }
 @media (min-width: 960px) { .exemple-mobile { display: none; } }
+
+
+/* =================== Visite guidée =================== */
+.barre-outils { display: flex; align-items: center; gap: 8px; }
+.barre-outils .btn-theme { margin-left: 0; }
+
+.invitation-visite {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin: 0 0 18px;
+  padding: 12px 16px;
+  border: 1px solid var(--bord);
+  border-left: 4px solid var(--etiquette);
+  border-radius: var(--rayon);
+  background: var(--carte);
+}
+.invitation-visite p { margin: 0; }
+.invitation-actions { display: flex; gap: 8px; }
+.btn-mini-plein { background: var(--accent); color: var(--accent-texte); border-color: var(--accent); }
+
+.visite-fond { position: fixed; inset: 0; z-index: 100; background: transparent; }
+.visite-cadre {
+  position: fixed;
+  z-index: 101;
+  border-radius: 10px;
+  pointer-events: none;
+  outline: 2px solid var(--etiquette);
+  /* Assombrit tout sauf l'élément mis en valeur. */
+  box-shadow: 0 0 0 9999px rgb(4 7 11 / 74%);
+  transition: top 0.2s ease, left 0.2s ease, width 0.2s ease, height 0.2s ease;
+}
+.visite-carte {
+  position: fixed;
+  z-index: 102;
+  box-sizing: border-box;
+  padding: 14px 16px 16px;
+  border: 1px solid var(--bord);
+  border-radius: var(--rayon);
+  background: var(--carte);
+  color: var(--texte);
+  box-shadow: 0 12px 40px rgb(0 0 0 / 45%);
+}
+.visite-tete { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.visite-compteur {
+  padding: 1px 8px;
+  border-radius: 2px;
+  background: var(--etiquette);
+  color: var(--etiquette-texte);
+  font: 700 0.9rem var(--police-titre);
+}
+.visite-passer { background: none; border: 0; padding: 4px 6px; color: var(--texte-2); font-size: 0.88rem; text-decoration: underline; text-underline-offset: 3px; }
+.visite-carte h2 { font-size: 1.15rem; margin: 0 0 6px; }
+.visite-carte p { margin: 0 0 14px; color: var(--texte-2); line-height: 1.5; }
+.visite-actions { display: flex; gap: 8px; }
+.visite-actions button { margin: 0; flex: 1; padding: 10px 12px; }
+.visite-actions button[hidden] { display: none; }
+
+/* Flèche : un carré tourné, collé au bord de la carte qui regarde l'élément. */
+.visite-fleche {
+  position: absolute;
+  left: var(--fleche-x, 24px);
+  width: 16px;
+  height: 16px;
+  background: var(--carte);
+  border: 1px solid var(--bord);
+  transform: rotate(45deg);
+  animation: visite-rebond 1.1s ease-in-out infinite;
+}
+.visite-carte[data-cote="bas"] .visite-fleche { top: -9px; border-right: 0; border-bottom: 0; --pousse: -3px; }
+.visite-carte[data-cote="haut"] .visite-fleche { bottom: -9px; border-left: 0; border-top: 0; --pousse: 3px; }
+.visite-carte[data-cote="libre"] .visite-fleche { display: none; }
+@keyframes visite-rebond {
+  50% { translate: 0 var(--pousse, 0px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .visite-fleche { animation: none; }
+  .visite-cadre { transition: none; }
+}

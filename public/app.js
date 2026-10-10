@@ -22,6 +22,7 @@ import {
 import { URL_RELAIS } from "./config.js";
 import { initialiserCalcul } from "./ecran-calcul.js";
 import { construireRapportHtml, exporterWord } from "./rapport.js";
+import { demarrerVisite } from "./visite.js";
 
 const $ = (sel) => document.querySelector(sel);
 const CLE_HISTORIQUE = "netscan.historique";
@@ -877,10 +878,42 @@ $("#btn-theme").addEventListener("click", () => {
   else delete document.documentElement.dataset.theme;
   ecrire("netscan.theme", clair ? "light" : "");
   majBoutonTheme();
+});
+
+/* ---------- Visite guidée ---------- */
+
+const CLE_VISITE = "netscan.visite"; // « 1 » une fois la visite vue ou refusée
+
+function lancerVisiteGuidee() {
+  const surResultat = !$("#vue-resultat").hidden;
+  demarrerVisite({
+    resultat: surResultat,
+    // Le parcours de l'accueil part toujours de l'accueil ; celui du résultat, de l'onglet Schéma.
+    preparer: () => {
+      if (!surResultat) afficherVue("accueil");
+      else $('[data-onglet="schema"]')?.click();
+    },
+    declencheur: $("#btn-aide"),
+    fin: () => {
+      ecrire(CLE_VISITE, "1");
+      $("#invitation-visite").hidden = true;
+      if (surResultat) $('[data-onglet="schema"]')?.click();
+    },
+  });
+}
+
+$("#btn-aide").addEventListener("click", lancerVisiteGuidee);
+$("#btn-visite-oui").addEventListener("click", lancerVisiteGuidee);
+$("#btn-visite-non").addEventListener("click", () => {
+  ecrire(CLE_VISITE, "1");
+  $("#invitation-visite").hidden = true;
+});
+// Invitation (jamais de lancement automatique) à la toute première visite.
+$("#invitation-visite").hidden = Boolean(lire(CLE_VISITE));
 
 // Raccourci de l'appli installée (« Calcul IP ») : ./#calcul
 if (location.hash === "#calcul") afficherVue("calcul");
-});
+
 majBoutonTheme();
 
 /* ---------- Export du compte rendu ---------- */

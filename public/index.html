@@ -48,15 +48,28 @@
       <button type="button" data-nav="historique" id="btn-historique"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 7v5l3 2M3 12a9 9 0 1 0 3-6.7M3 4v4h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Historique</span></button>
       <button type="button" data-nav="reglages" id="btn-reglages"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Compte</span></button>
     </nav>
-    <button class="btn-icone btn-theme" id="btn-theme" type="button" aria-label="Passer en thème clair">
+    <div class="barre-outils">
+      <button class="btn-icone" id="btn-aide" type="button" aria-label="Visite guidée de l'appli">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1.1.9-1.1 1.6v.3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16.8" r="1.1" fill="currentColor"/></svg>
+      </button>
+      <button class="btn-icone btn-theme" id="btn-theme" type="button" aria-label="Passer en thème clair">
       <svg class="icone-soleil" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       <svg class="icone-lune" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
     </button>
+    </div>
   </header>
 
   <main>
     <!-- Accueil -->
     <section id="vue-accueil" class="vue">
+      <div class="invitation-visite" id="invitation-visite" role="region" aria-label="Visite guidée" hidden>
+        <p><strong>Première visite ?</strong> Une visite guidée de 30 secondes te montre où cliquer.</p>
+        <div class="invitation-actions">
+          <button type="button" class="btn-mini btn-mini-plein" id="btn-visite-oui">Commencer la visite</button>
+          <button type="button" class="btn-mini" id="btn-visite-non">Plus tard</button>
+        </div>
+      </div>
+
       <div class="tete-espace">
         <div class="facade" aria-hidden="true">
           <span class="facade-ports"><span class="rj"><i></i></span><span class="rj"><i></i></span><span class="rj"><i></i></span><span class="rj"><i></i></span><span class="rj"><i></i></span><span class="rj orange"><i></i></span><span class="rj"><i></i></span><span class="rj"><i></i></span></span>
