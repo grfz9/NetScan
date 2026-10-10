@@ -16,6 +16,7 @@ L'analyse d'image est faite par l'API Claude (Anthropic), avec une réponse au f
 
 - **Coller une configuration** (`show running-config`, `show ip interface brief`…) au lieu de photographier l'écran : plus fiable, et suffisant sans photo.
 - **Calcul IP** (icône calculatrice) : réseau, masque, broadcast, plage, binaire et découpage **VLSM**, avec les étapes expliquées. Hors ligne, gratuit.
+- **Visite guidée** (bouton « ? » en haut) : met en valeur chaque élément avec une flèche et une explication, pour l'accueil puis pour un résultat. Proposée une seule fois à la première visite.
 - **Compte rendu de TP** : sur un résultat, « Exporter le compte rendu » en **PDF** (impression) ou **Word (.docx)**, avec schémas, ports, configuration, diagnostic et démarche.
 
 ## Utiliser l'appli en ligne
