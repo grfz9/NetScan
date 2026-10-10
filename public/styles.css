@@ -970,22 +970,6 @@ code, kbd { font-family: var(--police-mono); }
 .barre-outils { display: flex; align-items: center; gap: 8px; }
 .barre-outils .btn-theme { margin-left: 0; }
 
-.invitation-visite {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px 16px;
-  margin: 0 0 18px;
-  padding: 12px 16px;
-  border: 1px solid var(--bord);
-  border-left: 4px solid var(--etiquette);
-  border-radius: var(--rayon);
-  background: var(--carte);
-}
-.invitation-visite p { margin: 0; }
-.invitation-actions { display: flex; gap: 8px; }
-.btn-mini-plein { background: var(--accent); color: var(--accent-texte); border-color: var(--accent); }
 
 .visite-fond { position: fixed; inset: 0; z-index: 100; background: transparent; }
 .visite-cadre {

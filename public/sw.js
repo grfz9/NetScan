@@ -3,7 +3,7 @@
 // - Chaque requête redemande d'abord la dernière version au serveur ; le cache ne sert qu'en secours.
 // - Sans réseau ni cache, une page s'ouvre : offline.html.
 // - Les analyses (relais, API) ne passent jamais par le cache.
-const CACHE = "netscan-v21";
+const CACHE = "netscan-v22";
 const FICHIERS = [
   "./",
   "index.html",
