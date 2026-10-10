@@ -882,7 +882,7 @@ $("#btn-theme").addEventListener("click", () => {
 
 /* ---------- Visite guidée ---------- */
 
-const CLE_VISITE = "netscan.visite"; // « 1 » une fois la visite vue ou refusée
+const CLE_VISITE = "netscan.visite"; // « 1 » une fois la visite vue ou passée
 
 function lancerVisiteGuidee() {
   const surResultat = !$("#vue-resultat").hidden;
@@ -896,20 +896,27 @@ function lancerVisiteGuidee() {
     declencheur: $("#btn-aide"),
     fin: () => {
       ecrire(CLE_VISITE, "1");
-      $("#invitation-visite").hidden = true;
       if (surResultat) $('[data-onglet="schema"]')?.click();
     },
   });
 }
 
 $("#btn-aide").addEventListener("click", lancerVisiteGuidee);
-$("#btn-visite-oui").addEventListener("click", lancerVisiteGuidee);
-$("#btn-visite-non").addEventListener("click", () => {
+
+// La visite démarre toute seule à la toute première visite. Elle est marquée comme vue dès son
+// lancement : un rechargement en cours de route ne la relance jamais. Elle ne démarre pas si la page
+// est ouverte pour autre chose (retour de paiement, lien direct vers un outil) ni sur claude.ai.
+function visiteAutomatique() {
+  const ailleurs = location.hash || new URLSearchParams(location.search).has("achat");
+  if (lire(CLE_VISITE) || sessionStorage.getItem("netscan.visiteVue") || SUR_CLAUDE_AI || ailleurs) return;
+  try {
+    sessionStorage.setItem("netscan.visiteVue", "1"); // si le stockage durable est bloqué, pas de répétition
+  } catch {}
   ecrire(CLE_VISITE, "1");
-  $("#invitation-visite").hidden = true;
-});
-// Invitation (jamais de lancement automatique) à la toute première visite.
-$("#invitation-visite").hidden = Boolean(lire(CLE_VISITE));
+  // On attend les polices et la fin de la mise en page, sinon les cadres seraient mal placés.
+  document.fonts.ready.then(() => setTimeout(() => !$("#vue-accueil").hidden && lancerVisiteGuidee(), 700));
+}
+visiteAutomatique();
 
 // Raccourci de l'appli installée (« Calcul IP ») : ./#calcul
 if (location.hash === "#calcul") afficherVue("calcul");
